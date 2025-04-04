@@ -25,6 +25,11 @@ class Cleaner:
                 if id_col is None:
                     raise ValueError("No Detection of Time")
             self.df = self.df.melt(id_vars=id_col, var_name='Period', value_name='Value')
+        else:
+            expected_cols = ['Year', 'Period']
+            for col in expected_cols:
+                if col not in self.df.columns:
+                    raise ValueError(f"Missing required column: {col}")
         return self
 
     def convert_date(self):
@@ -40,18 +45,32 @@ class Cleaner:
         return self
 
     def finalize(self):
-        self.df = self.df.dropna(subset=['Value'])
-
+    
         if self.time_freq == "monthly":
             sort_col = 'YearMonth'
         elif self.time_freq == "quarterly":
             sort_col = 'YearQuarter'
         else:
             raise ValueError("Unsupported time frequency")
-        self.df = self.df[[sort_col, 'Value']].sort_values(sort_col).reset_index(drop=True)
+    
+        if sort_col not in self.df.columns:
+            raise ValueError(f"Expected time column '{sort_col}' not found.")
+        
+        exclude_cols = ['Year', 'Period', 'Month', sort_col]
+        value_cols = [col for col in self.df.columns if col not in exclude_cols]
 
-        new_col = f"{self.var_name}_{self.unit}"
-        self.df = self.df.rename(columns={'Value': new_col})
+        self.df = self.df.dropna(subset=value_cols, how='all')
+
+        rename_dict = {}
+        for col in value_cols:
+            if col == "Value":
+                new_col = f"{self.var_name}_{self.unit}".strip('_')
+            else:
+                new_col = f"{self.var_name}_{self.unit}_{col}".strip('_')
+            rename_dict[col] = new_col
+        
+        self.df = self.df[[sort_col] + value_cols].sort_values(sort_col).reset_index(drop=True)
+        self.df = self.df.rename(columns=rename_dict)
         return self.df
 
     def clean(self):

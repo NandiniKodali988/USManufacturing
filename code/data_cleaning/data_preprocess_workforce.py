@@ -1,5 +1,5 @@
-from data_cleaning import Cleaner
-from config_cleaning import configs
+from data_cleaning_workforce import Cleaner
+from config_cleaning_workforce import configs
 from functools import reduce
 import pandas as pd
 import os

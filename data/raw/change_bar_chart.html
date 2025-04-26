@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "data": {"name": "data-ca30dc2eead5f54c4ff5b47b629430a0"}, "mark": {"type": "bar"}, "encoding": {"color": {"condition": {"test": "(datum.Change > 0)", "value": "steelblue"}, "value": "orangered"}, "tooltip": [{"field": "Industry", "type": "nominal"}, {"field": "Change", "format": ".2f", "type": "quantitative"}], "x": {"field": "Industry", "title": "Industry", "type": "nominal"}, "y": {"field": "Change", "title": "Percentage Change", "type": "quantitative"}}, "height": 300, "title": "Percentage Change from 2013-01 to 2013-08", "width": 800, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-ca30dc2eead5f54c4ff5b47b629430a0": [{"Month_start": "2013-01-01T00:00:00", "Industry": "Manufacturing", "Employment_start": 11962.0, "Month_end": "2013-08-01T00:00:00", "Employment_end": 11992.0, "Change": 0.2501667778519013}, {"Month_start": "2013-01-01T00:00:00", "Industry": "Construction", "Employment_start": 5746.0, "Month_end": "2013-08-01T00:00:00", "Employment_end": 5878.0, "Change": 2.2456617897243962}, {"Month_start": "2013-01-01T00:00:00", "Industry": "Retail trade", "Employment_start": 14887.8, "Month_end": "2013-08-01T00:00:00", "Employment_end": 15091.6, "Change": 1.3504201012483836}, {"Month_start": "2013-01-01T00:00:00", "Industry": "Transportation and warehousing", "Employment_start": 4465.0, "Month_end": "2013-08-01T00:00:00", "Employment_end": 4479.8, "Change": 0.3303718916023077}, {"Month_start": "2013-01-01T00:00:00", "Industry": "Leisure and hospitality", "Employment_start": 14037.0, "Month_end": "2013-08-01T00:00:00", "Employment_end": 14327.0, "Change": 2.0241502059049346}, {"Month_start": "2013-01-01T00:00:00", "Industry": "Financial activities", "Employment_start": 7837.0, "Month_end": "2013-08-01T00:00:00", "Employment_end": 7902.0, "Change": 0.8225765628954695}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

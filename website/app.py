@@ -72,10 +72,30 @@ This raises a natural next question:
 **How are specific manufacturing subsectors performing—and who is driving this transformation?**
 """)
 
+# --- Buyers ---
+st.markdown("""
+            # Buyers
+""")
+               
+with open("img/Price_index.html", "r") as f:
+    html_content = f.read()
+
+components.html(html_content, height=700, scrolling=True)
 
 # --- Annual Worker Metrics ---
 st.markdown("""
-# Annual Worker
+                                 # Two Perspectives from Producer and Worker
+            
+## Producer
+Our parallel coordinates plot reveals:
+- **Steady increases in hourly earnings and total compensation** over the past decade
+- **Relatively flat or slightly declining weekly hours**, suggesting efficiency gains
+
+These labor dynamics reflect **rising costs per hour** but not necessarily falling competitiveness.
+
+In addition, the connected scatterplot links **labor productivity** with **unit labor costs**, across policy shifts (A, B, C). We observe how policy environments correspond with changes in both efficiency and cost burdens, highlighting the **trade-offs of regulatory and economic decisions**.
+
+## Worker
 
 This plot visualizes the annual trends of several key labor metrics from **2013 to 2024**.
 
@@ -88,47 +108,22 @@ Each line represents a different year, tracking across four dimensions:
 The color gradient from light blue to dark blue represents the timeline:  
 lighter colors are earlier years, darker colors are more recent years.
 
-## 🔍 Why This Plot Matters
+### 🔍 Why This Plot Matters
 
 - **Compare multiple metrics simultaneously**, showing relationships across time.
 - **Overall wage increase** observed after 2020.
 - **Significant dip around 2020**, likely caused by the COVID-19 pandemic.
 - Highlights evolving **labor cost and productivity** trends across a decade.
 """)
+with open("img/Connected_chart.html", "r") as f:
+    html_content = f.read()
+
+components.html(html_content, height=800, scrolling=True)
 
 with open("img/Annual_worker.html", "r") as f:
     html_content = f.read()
 
 components.html(html_content, height=500, scrolling=True)
-
-
-# --- Producer ---
-st.markdown("""
-# Producer
-Our parallel coordinates plot reveals:
-- **Steady increases in hourly earnings and total compensation** over the past decade
-- **Relatively flat or slightly declining weekly hours**, suggesting efficiency gains
-
-These labor dynamics reflect **rising costs per hour** but not necessarily falling competitiveness.
-
-In addition, the connected scatterplot links **labor productivity** with **unit labor costs**, across policy shifts (A, B, C). We observe how policy environments correspond with changes in both efficiency and cost burdens, highlighting the **trade-offs of regulatory and economic decisions**.
-
-Lastly, we examine **GDP contribution growth rates** across subsectors to see where the momentum lies—and which industries are driving the modern manufacturing engine.
-""")
-
-st.markdown("""
----
-### Producer
-- **Worker compensation is rising**, but not at the expense of weekly hours—pointing to increased wage pressure and potential productivity trade-offs.
-- **Policy shifts are tightly linked** to changes in cost-productivity dynamics, and visualizing them helps contextualize what drives these transitions.
-- Certain manufacturing subsectors are **outpacing others in GDP growth**, suggesting that the decline narrative is not universal—**some producers are thriving**.
-
-This producer-centered perspective helps us understand not just the “what” of the trend, but the **“who” and “why”** behind the change.
-""")
-with open("img/Connected_chart.html", "r") as f:
-    html_content = f.read()
-
-components.html(html_content, height=800, scrolling=True)
 
 # --- Conclusion ---
 st.header("🔍 Conclusion")

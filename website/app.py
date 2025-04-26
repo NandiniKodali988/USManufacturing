@@ -31,7 +31,7 @@ st.markdown("<h4>Explore the transformation of the American manufacturing sector
 
 st.markdown("""
 # Introduction
-Welcome to our interactive data dashboard. In this app, we take a deep dive into the **past, present, and future of U.S. manufacturing**, drawing from national statistics and industry-specific data.
+This project aims to analyze the **recent trends in U.S. manufacturing**, identify the factors influencing its trajectory, and provide insights into the industry's future direction.
 
 **Why this matters:**  
 Manufacturing plays a critical role in employment, exports, innovation, and economic stability. But its form is evolving.
@@ -39,7 +39,7 @@ Manufacturing plays a critical role in employment, exports, innovation, and econ
 This app is divided into two parts:
 
 - 🔍 **Big Picture** — Understand how manufacturing contributes to GDP, employment. 
-- 🧩 **Small Picture** — Dive into Buyers and Producers
+- 🧩 **Two Perspectives** — Dive into Buyers and Producers
 ---
 """)
 
@@ -55,8 +55,6 @@ st.markdown("""
   - **Emerging economies** show steady industrial growth
 - Reveals shifting patterns in global industrial competitiveness
 """)
-
-st.header("🔬 Manufacturing_gdp_map for whole world")
 with open("img/manufacturing_gdp_map.html", "r") as f:
     html_content = f.read()
 
@@ -77,7 +75,7 @@ This raises a natural next question:
 
 # --- Annual Worker Metrics ---
 st.markdown("""
-# 📊 Annual Worker Metrics Parallel Coordinates
+# Annual Worker
 
 This plot visualizes the annual trends of several key labor metrics from **2013 to 2024**.
 
@@ -107,8 +105,6 @@ components.html(html_content, height=500, scrolling=True)
 # --- Producer ---
 st.markdown("""
 # Producer
-To better understand the transformation, we now shift from the **macro scale** into **Buyers and Producers** perspective.
-
 Our parallel coordinates plot reveals:
 - **Steady increases in hourly earnings and total compensation** over the past decade
 - **Relatively flat or slightly declining weekly hours**, suggesting efficiency gains
@@ -122,14 +118,17 @@ Lastly, we examine **GDP contribution growth rates** across subsectors to see wh
 
 st.markdown("""
 ---
-### 🧠 Key Takeaways (Small Picture)
+### Producer
 - **Worker compensation is rising**, but not at the expense of weekly hours—pointing to increased wage pressure and potential productivity trade-offs.
 - **Policy shifts are tightly linked** to changes in cost-productivity dynamics, and visualizing them helps contextualize what drives these transitions.
 - Certain manufacturing subsectors are **outpacing others in GDP growth**, suggesting that the decline narrative is not universal—**some producers are thriving**.
 
 This producer-centered perspective helps us understand not just the “what” of the trend, but the **“who” and “why”** behind the change.
 """)
+with open("img/Connected_chart.html", "r") as f:
+    html_content = f.read()
 
+components.html(html_content, height=800, scrolling=True)
 
 # --- Conclusion ---
 st.header("🔍 Conclusion")

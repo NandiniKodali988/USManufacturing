@@ -1,0 +1,172 @@
+---
+title: "Manufacturing Analysis"
+format:
+  html:
+    toc: false
+    embed-resources: true
+    self-contained: true
+    output-dir: website
+execute:
+  kernel: python3
+  echo: false
+---
+
+# US Manufacture
+Understanding recent trends, sector drivers, and the evolving role of manufacturing in the U.S. economy.
+
+## Introduction
+Over the past decade, U.S. manufacturing has faced significant shifts driven by globalization, technological innovation, and major policy interventions. The manufacturing sector has long been a pillar of the American economy, but competitive pressures from abroad, rising domestic costs, and unexpected disruptions such as the COVID-19 pandemic have reshaped its trajectory.
+This project aims to provide insight into the factors that have driven the trends observed in the U.S. manufacturing sector. We first examine the U.S. manufacturing industry from a global perspective, analyzing how its contribution to the world's total manufacturing output has evolved over time, as well as its role within the broader U.S. economy.
+Subsequently, we focus internally on three closely related dimensions—the domestic market, enterprises, and industry workers—to uncover deeper insights into the structural changes shaping the sector.
+
+## Analytical Question
+To analyze this, we form the following analytical questions
+
+- How does the U.S. manufacturing industry experience overall growth or decline in recent years?
+- What are the key factors influencing these trends?
+- What role has government policy (e.g., reshoring efforts) played in shaping the manufacturing
+industry?
+
+# Big Picture
+
+## Global Positioning of U.S. Manufacturing (2013–2024)
+
+```{python}
+import pandas as pd
+import plotly.express as px
+df = pd.read_csv("../data/raw/manufacturing-value-added-to-gdp.csv")
+# rename the GDP column for convenience
+df = df.rename(columns={"Manufacturing, value added (% of GDP)": "ManufacturingGDP"})
+df = df[(df['Year'] >= 2013) & (df['Year'] <= 2024)]
+df = df.dropna(subset=['Code']).reset_index(drop=True)
+df_filtered = df[(df["Year"] >= 2013) & (df["Year"] <= 2024)]
+# Create animated choropleth map
+fig = px.choropleth(
+    df_filtered,
+    locations="Entity",
+    locationmode="country names",   # Use full country names
+    color="ManufacturingGDP",
+    hover_name="Entity",
+    animation_frame="Year",
+    color_continuous_scale="Blues",
+    range_color=[0, 40],            # Adjust range if needed
+    title="Manufacturing as % of GDP by Country (2013–2024)"
+)
+fig.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    coloraxis_colorbar=dict(title="% of GDP")
+)
+fig.show()
+```
+
+- The map shows the share of manufacturing output as a percentage of GDP across countries.
+- Higher percentages indicate economies more dependent on manufacturing (e.g., China, Vietnam).
+- Advanced economies, including the U.S., have a lower manufacturing share, reflecting a shift toward services
+- For the U.S., manufacturing remains sizable but accounts for a smaller share of its national economy over time
+- This trend highlights increased external competition and sets the stage for analyzing internal market, enterprise, and workforce dynamics.
+
+## Manufacturing’s Place in the U.S. Labor Market
+
+```{python}
+import pandas as pd
+import altair as alt
+
+df_clean = pd.read_csv("../data/Processed/employment_rate.csv")
+df_clean['Month'] = pd.to_datetime(df_clean['Month'], errors='coerce')
+
+industries_to_plot = [
+    'Manufacturing',
+    'Construction',
+    'Retail trade',
+    'Transportation and warehousing',
+    'Leisure and hospitality',
+    'Financial activities'
+]
+
+df_long = df_clean.melt(
+    id_vars=['Month'],
+    value_vars=industries_to_plot,
+    var_name='Industry',
+    value_name='Employment'
+)
+
+trend_chart = alt.Chart(df_long).mark_line().encode(
+    x=alt.X('Month:T', title='Year'),
+    y=alt.Y('Employment:Q', title='Employment (Thousands)'),
+    color=alt.Color('Industry:N', scale=alt.Scale(scheme='category10')),
+    tooltip=['Month:T', 'Industry:N', 'Employment:Q']
+).properties(
+    width='container',
+    height=400,
+    title='Employment Trend by Industry (2005–2025)'
+)
+
+trend_chart.display()
+```
+
+- The U.S. labor market has experienced steady growth across most sectors over the past decade.
+- Employment in manufacturing remained relatively stable compared to other industries.
+- Leisure and hospitality, and transportation and warehousing, showed much faster employment growth, especially after the pandemic.
+- Despite moderate recovery post-2020, manufacturing's employment share relative to the overall economy continued to decline.
+- This trend reflects a long-term structural shift where services and logistics increasingly dominate U.S. employment, while manufacturing's role diminishes.
+- Understanding this decline is key to analyzing labor dynamics within the manufacturing sector itself.
+
+## Conclusion
+The analysis of global positioning and domestic labor trends reveals a consistent pattern: U.S. manufacturing is facing a gradual decline in relative importance both globally and at home. Increased external competition and internal shifts toward service-driven economic structures have reshaped the sector’s role.
+However, to fully understand the current challenges and opportunities within U.S. manufacturing, it is essential to move beyond the broad view and examine the internal dynamics more closely.
+In the following sections, we dive deeper into three critical dimensions: the behavior of the domestic market, the response of enterprises and policies, and the evolving conditions of the industrial workforce.
+
+# From Global Trends to Internal Realities: U.S. Manufacturing in Focus
+
+## Trends in Domestic Market and Import Dynamics
+
+:::{.panel-tabset}
+### Price index
+
+<iframe src="../img/Price_Index.html" width="200%" height="650px" frameborder="0"></iframe>
+
+:::
+
+- Between 2013 and 2024, imported manufactured goods consistently maintained a price advantage over domestic products, with this advantage deepening significantly between 2019 and 2021.
+- This period coincided with a notable increase in the total value of imported goods, reflecting the strengthening competitive pressure on U.S. manufacturing.
+- Although domestic manufacturing output also grew, the faster expansion of imports led to a steady rise in the share of imported goods within the U.S. manufacturing market, reaching historic highs by 2024.
+- These trends suggest that price dynamics, market expansion, and evolving procurement preferences collectively contributed to reshaping the competitive landscape of U.S. manufacturing.
+ 
+## Policy and Enterprise Developments
+
+:::{.panel-tabset}
+### Manufacturing Enterprises
+
+<iframe src="../img/cost_eff_producer.html" width="200%" height="750px" frameborder="0"></iframe>
+
+:::
+
+- Between 2013 and 2024, the U.S. manufacturing sector experienced rising unit labor costs with only marginal gains in labor productivity, intensifying cost pressures on enterprises.
+- Policy interventions—including tariff implementations, executive orders, and advanced manufacturing strategies—coincided with noticeable shifts in enterprise growth rates.
+- While these policies stimulated short-term increases in private manufacturing establishments, the effects were not sustained, suggesting structural challenges beyond policy incentives.
+- Overall, rising costs and limited productivity improvements highlight the difficulties faced by enterprises in adapting to a more competitive and rapidly evolving manufacturing landscape.
+ 
+ 
+## Workforce Conditions in U.S. Manufacturing
+
+:::{.panel-tabset}
+### Worker
+
+<iframe src="../img/workers.html" width="200%" height="750px" frameborder="0"></iframe>
+
+:::
+
+- The U.S. manufacturing workforce underwent significant shifts between 2013 and 2024.
+- While hourly earnings and total compensation steadily increased before the pandemic, they accelerated sharply after 2020, reflecting intensified competition for labor and heightened cost burdens for employers.
+- Notably, total compensation—encompassing both wages and benefits—grew faster than base earnings alone, emphasizing the rising importance of comprehensive employee packages.
+- Meanwhile, despite a rapid rebound in employment and job openings following the pandemic shock, growth momentum weakened after 2022.
+- Unemployment rates returned to low pre-pandemic levels, yet the net expansion of manufacturing establishments slowed, signaling deeper structural challenges in sustaining a dynamic industrial labor force.
+
+# Conclusion
+ 
+- U.S. manufacturing’s global and domestic significance has steadily declined over the past decade, reflecting structural shifts toward services.
+- Imported manufactured goods captured an increasing share of the U.S. market, driven by relative price advantages, especially after 2020.
+- Policy interventions stimulated short-term growth in manufacturing establishments, but long-term structural challenges persist.
+- Labor costs surged sharply post-2020, intensifying pressures on enterprises despite partial employment recovery
+- Future success will depend on deep transformations in labor practices, cost efficiency, supply chain strategies, and innovation capabilities.
+ 

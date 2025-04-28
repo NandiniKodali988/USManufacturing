@@ -1,9 +1,0 @@
----
-title: "Project Overview"
----
-
-## Introduction
-Basically the scope of the manufacturing industry scope and why we want to do this project
-
-## Objective
-Data Science questions we want to answer

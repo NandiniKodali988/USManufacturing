@@ -1,0 +1,21 @@
+project:
+  type: website
+  output-dir: website/
+  render:
+    - website/*.qmd
+
+website:
+  title: "Manufacturing Sector Trends in the US"
+  navbar:
+    left:
+      - href: website/website.qmd
+        text: Analysis Report
+  search: true
+
+format:
+  html:
+    theme: cosmo
+    toc: false
+    mathjax: "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_HTML"
+    embed-resources: true
+    self-contained: true

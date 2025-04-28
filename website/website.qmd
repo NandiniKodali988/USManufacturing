@@ -27,9 +27,76 @@ To analyze this, we form the following analytical questions
 - What role has government policy (e.g., reshoring efforts) played in shaping the manufacturing
 industry?
 
-# Big Picture
+# A Big-Picture View of U.S. Manufacturing
 
-## Global Positioning of U.S. Manufacturing (2013–2024)
+## Global Positioning of U.S. Manufacturing (2013–2023)
+
+```{python}
+import pandas as pd
+import numpy as np
+import plotly.express as px
+df = pd.read_csv("../data/Processed/GdpByInd.csv")
+# Clean up column names just in case
+df.columns = df.columns.str.strip()
+
+# Identify actual year columns (assuming they are 4-digit years)
+year_columns = [col for col in df.columns if col.isdigit() and len(col) == 4]
+
+# Melt the data safely
+df_long = df.melt(
+    id_vars=["Group", "Subgroup"],
+    value_vars=year_columns,
+    var_name="Year",
+    value_name="Value"
+)
+
+# Convert year to integer
+df_long["Year"] = df_long["Year"].astype(int)
+
+df_grouped = df_long.groupby(["Group", "Year"], as_index=False)["Value"].sum()
+
+unique_groups = df_grouped["Group"].unique()
+group_positions = {
+    group: (np.cos(i * 2 * np.pi / len(unique_groups)) * 3,
+            np.sin(i * 2 * np.pi / len(unique_groups)) * 3)
+    for i, group in enumerate(unique_groups)
+}
+
+# Step 1: Filter for 2013–2024
+df_grouped_filtered = df_grouped[df_grouped["Year"].between(2013, 2024)].copy()
+
+# Step 2: Add a column for custom coloring
+df_grouped_filtered["Color"] = df_grouped_filtered["Group"].apply(
+    lambda g: "Manufacturing" if g == "Manufacturing" else "Other"
+)
+
+# Step 3: Define color map (blue for Manufacturing, gray for others)
+color_map = {
+    "Manufacturing": "steelblue",
+    "Other": "lightgray"
+}
+
+# Step 4: Build the animated bar chart
+fig = px.bar(
+    df_grouped_filtered,
+    x="Value",
+    y="Group",
+    color="Color",
+    animation_frame="Year",
+    orientation='h',
+    color_discrete_map=color_map,
+    title="Group-Level Output Race Over Time (2013–2024)"
+)
+
+fig.update_layout(
+    showlegend=False,
+    xaxis=dict(range=[0, 12500000]),  # optional: adjust max
+    margin=dict(t=40, l=100, r=40, b=40)
+)
+
+fig.show()
+```
+
 
 ```{python}
 import pandas as pd
@@ -71,9 +138,11 @@ fig.show()
 import pandas as pd
 import altair as alt
 
+# 读取数据
 df_clean = pd.read_csv("../data/Processed/employment_rate.csv")
 df_clean['Month'] = pd.to_datetime(df_clean['Month'], errors='coerce')
 
+# 选择行业并转换成长格式
 industries_to_plot = [
     'Manufacturing',
     'Construction',
@@ -90,19 +159,36 @@ df_long = df_clean.melt(
     value_name='Employment'
 )
 
-trend_chart = alt.Chart(df_long).mark_line().encode(
+# 定义行业排序，确保 "Manufacturing" 排第一
+industry_order = ['Manufacturing', 'Construction', 'Retail trade', 'Transportation and warehousing', 
+                  'Leisure and hospitality', 'Financial activities']
+
+# 创建堆叠面积图
+area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
     x=alt.X('Month:T', title='Year'),
-    y=alt.Y('Employment:Q', title='Employment (Thousands)'),
-    color=alt.Color('Industry:N', scale=alt.Scale(scheme='category10')),
+    y=alt.Y('Employment:Q', stack='zero', title='Employment (Thousands)'),  # stack='zero'是正常叠加
+    color=alt.Color('Industry:N', scale=alt.Scale(scheme='category10'), sort=industry_order),  # 确保 "Manufacturing" 在最前面
     tooltip=['Month:T', 'Industry:N', 'Employment:Q']
 ).properties(
-    width='container',
+    width=800,
     height=400,
-    title='Employment Trend by Industry (2005–2025)'
+    title='Stacked Employment Trend by Industry (2013–2023)'
 )
 
-trend_chart.display()
+# 调整legend位置，放置在图表外部
+area_stack_chart = area_stack_chart.configure_legend(
+    orient='top',  # 设置legend位置为上方
+    direction='horizontal',  # 设置legend为横向排列
+    title=None,  # 移除legend标题
+    offset=20,  # 调整图表和legend之间的间距
+    padding=10,  # 添加内边距
+    labelFontSize=12  # 设置标签的字体大小
+)
+
+area_stack_chart.display()
+
 ```
+
 
 - The U.S. labor market has experienced steady growth across most sectors over the past decade.
 - Employment in manufacturing remained relatively stable compared to other industries.
@@ -121,8 +207,7 @@ In the following sections, we dive deeper into three critical dimensions: the be
 ## Trends in Domestic Market and Import Dynamics
 
 :::{.panel-tabset}
-### Price index
-
+#### Trends in Domestic Market and Import Dynamics
 <iframe src="../img/Price_Index.html" width="200%" height="650px" frameborder="0"></iframe>
 
 :::
@@ -135,8 +220,7 @@ In the following sections, we dive deeper into three critical dimensions: the be
 ## Policy and Enterprise Developments
 
 :::{.panel-tabset}
-### Manufacturing Enterprises
-
+#### Policy and Enterprise Developments
 <iframe src="../img/cost_eff_producer.html" width="200%" height="750px" frameborder="0"></iframe>
 
 :::
@@ -150,8 +234,7 @@ In the following sections, we dive deeper into three critical dimensions: the be
 ## Workforce Conditions in U.S. Manufacturing
 
 :::{.panel-tabset}
-### Worker
-
+#### Workforce Conditions in U.S. Manufacturing
 <iframe src="../img/workers.html" width="200%" height="750px" frameborder="0"></iframe>
 
 :::

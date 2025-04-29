@@ -4,17 +4,13 @@ format:
     revealjs
 embed-resources: true
 
-
 output-dir: _site  # Specify the output directory for the rendered slides
 assets: img  # Ensure the 'img' folder is included
 ---
 
-
 ## The News Reported That...
 
 <img src="news.png" width="20%" style="display: block; margin-left: auto; margin-right: auto;" />
-
-
 
 
 # A Big-Picture View of U.S. Manufacturing
@@ -63,7 +59,7 @@ fig.show()
 
 ```
 
-<small>Figure 1: Manufacturing as a Percentage of GDP by Country (2013–2024)</small>
+
 
 ---
 
@@ -160,7 +156,6 @@ fig.update_layout(
 fig.show()
 ```
 
-<small>Figure 2: Group-Level Output Race Over Time(2013-2023)</small>
 
 ---
 
@@ -291,7 +286,6 @@ area_stack_chart = area_stack_chart.configure_legend(
 display(area_stack_chart)
 ```
 
-<small>Figure 3: Employment Trend by Industry(2013-2023)</small>
 
 # What factors have contributed to these trends?
 
@@ -453,7 +447,6 @@ final_chart = alt.vconcat(alt.vconcat(main_chart, popup), caption, spacing = 10)
 final_chart
 ```
 
-<small>Figure 5:Evolution of Efficiency, Cost, and Scale in U.S. Manufacturing Enterprises (2013-2024)</small>
 
 ---
 
@@ -707,7 +700,6 @@ chart = alt.vconcat(
 chart
 ```
 
-<small>Figure 5:Evolution of Efficiency, Cost, and Scale in U.S. Manufacturing Enterprises (2013-2024)</small>
 
 ---
 
@@ -823,13 +815,14 @@ years = sorted(df_long['Year'].unique())
 start_dd = alt.param(
     name='start_year',
     bind=alt.binding_select(options=years, name='Starting Year: '),
-    value=years[0]
+    value=years[0],
 )
 
 end_dd = alt.param(
     name='end_year',
     bind=alt.binding_select(options=years, name='Ending Year: '),
-    value=years[-1]
+    value=years[-1],
+    
 )
 
 highlight = (alt.datum.Year >= start_dd) & (alt.datum.Year <= end_dd)
@@ -913,16 +906,14 @@ final = alt.vconcat(parallel_coords, b1, b2).properties(title = alt.TitleParams(
 final
 ```
 
-<small>Figure 6:Evolution of Wages, Working Hours, and Employment Conditions of U.S. Manufacturing Workers (2013-2024)</small>
 
 # Conclusion
 
 ---
 
-- Decline in significance: U.S. manufacturing’s role, both globally and domestically, has decreased.
-- Imports gained a larger share of the U.S. market due to price advantages, especially post-2020.
-- Short-term policy success, but long-term structural challenges remain.
-- Labor costs surged post-2020, adding pressure on enterprises despite some employment recovery.
-- Future success hinges on transformations in labor practices, cost efficiency, supply chain strategies, and innovation.
+### Forces Shaped a Recovery that is Real, But Uneven ...
+- **Market Dynamics** — imported goods have become significantly cheaper than domestic ones, capturing a growing share of the market.
+- **Policy and Enterprise Developments** — while federal initiatives sparked short-term growth, structural issues like high costs and slow productivity gains limited long-term impact.
+- **Workforce Conditions** — rising wages and volatile employment trends have made labor costs harder to manage.
 
 # Thank You 

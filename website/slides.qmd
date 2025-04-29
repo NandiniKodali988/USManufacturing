@@ -1,0 +1,512 @@
+---
+title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
+format: revealjs
+output-dir: slides  # Link to your custom CSS file
+embed: true
+---
+
+## The News Reported That...
+
+
+
+
+# A Big-Picture View of U.S. Manufacturing
+---
+
+#### Global Positioning 
+
+```{python}
+import pandas as pd
+import plotly.express as px
+df = pd.read_csv("../data/raw/manufacturing-value-added-to-gdp.csv")
+# rename the GDP column for convenience
+df = df.rename(columns={"Manufacturing, value added (% of GDP)": "ManufacturingGDP"})
+df = df[(df['Year'] >= 2013) & (df['Year'] <= 2024)]
+df = df.dropna(subset=['Code']).reset_index(drop=True)
+df_filtered = df[(df["Year"] >= 2013) & (df["Year"] <= 2024)]
+# Create animated choropleth map
+fig = px.choropleth(
+    df_filtered,
+    locations="Entity",
+    locationmode="country names",   # Use full country names
+    color="ManufacturingGDP",
+    hover_name="Entity",
+    animation_frame="Year",
+    color_continuous_scale="Blues",
+    range_color=[0, 40],            # Adjust range if needed
+    title="Manufacturing as % of GDP by Country (2013–2024)"
+)
+fig.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    coloraxis_colorbar=dict(title="% of GDP")
+)
+fig.show()
+```
+
+<small>Figure 1: Manufacturing as a Percentage of GDP by Country (2013–2024)</small>
+
+---
+
+#### GDP Race: Manufacturing vs. other Sectors
+
+```{python}
+import plotly.express as px
+import pandas as pd
+import numpy as np
+import plotly.express as px
+df = pd.read_csv("../data/Processed/GdpByInd.csv")
+# Clean up column names just in case
+df.columns = df.columns.str.strip()
+
+# Identify actual year columns (assuming they are 4-digit years)
+year_columns = [col for col in df.columns if col.isdigit() and len(col) == 4]
+
+# Melt the data safely
+df_long = df.melt(
+    id_vars=["Group", "Subgroup"],
+    value_vars=year_columns,
+    var_name="Year",
+    value_name="Value"
+)
+
+# Convert year to integer
+df_long["Year"] = df_long["Year"].astype(int)
+
+df_grouped = df_long.groupby(["Group", "Year"], as_index=False)["Value"].sum()
+
+unique_groups = df_grouped["Group"].unique()
+group_positions = {
+    group: (np.cos(i * 2 * np.pi / len(unique_groups)) * 3,
+            np.sin(i * 2 * np.pi / len(unique_groups)) * 3)
+    for i, group in enumerate(unique_groups)
+}
+
+# Filter for 2013–2024
+df_grouped_filtered = df_grouped[df_grouped["Year"].between(2013, 2024)].copy()
+
+# Convert from millions to billions
+df_grouped_filtered["Value_Trillions"] = df_grouped_filtered["Value"] / 1000000
+
+# Step 2: Add a column for custom coloring
+df_grouped_filtered["Color"] = df_grouped_filtered["Group"].apply(
+    lambda g: "Manufacturing" if g == "Manufacturing" else "Other"
+)
+
+# Step 3: Define color map (blue for Manufacturing, gray for others)
+color_map = {
+    "Manufacturing": "steelblue",
+    "Other": "lightgray"
+}
+
+fig = px.bar(
+    df_grouped_filtered,
+    x="Value_Trillions",
+    y="Group",
+    color="Color",
+    animation_frame="Year",
+    orientation='h',
+    color_discrete_map=color_map,
+    title="Group-Level Output Race Over Time (2013–2024)",
+    hover_data={"Color": False}  # hide 'Color' in tooltip
+)
+
+# Set custom tooltip on static traces (initial frame)
+for trace in fig.data:
+    trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion USD): %{x:.2f}<extra></extra>"
+
+# Set custom tooltip on animated frames
+for frame in fig.frames:
+    for trace in frame.data:
+        trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion USD): %{x:.2f}<extra></extra>"
+
+# Layout settings
+fig.update_layout(
+    showlegend=False,
+    xaxis=dict(
+        title="Output (Trillions USD)",
+        tickformat=".2f",
+        range=[0, 12.5]
+    ),
+    margin=dict(t=40, l=100, r=40, b=40)
+)
+
+fig.show()
+```
+
+<small>Figure 2: Group-Level Output Race Over Time(2013-2023)</small>
+
+---
+
+#### Employment Race: Manufacturing vs. other Sectors
+
+```{python}
+import pandas as pd
+import altair as alt
+import ipywidgets as widgets
+from IPython.display import display
+from ipywidgets import VBox
+
+# Read data
+df_clean = pd.read_csv("../data/Processed/employment_rate.csv")
+df_clean['Month'] = pd.to_datetime(df_clean['Month'], errors='coerce')
+
+# Original industries to plot
+industries_to_plot = [
+    'Manufacturing',
+    'Construction',
+    'Retail trade',
+    'Transportation and warehousing',
+    'Leisure and hospitality',
+    'Financial activities'
+]
+
+# Mapping of original industry names to new legend labels
+legend_labels = {
+    'Manufacturing': 'Manufacturing',
+    'Construction': 'Utilities & Construction',
+    'Retail trade': 'Retail trade',
+    'Transportation and warehousing': 'Transportation and warehousing',
+    'Leisure and hospitality': 'Health, Education & Leisure',
+    'Financial activities': 'Information & Finance'
+}
+
+# Melt data to long format
+df_long = df_clean.melt(
+    id_vars=['Month'],
+    value_vars=industries_to_plot,
+    var_name='Industry',
+    value_name='Employment'
+)
+
+# Add custom legend labels based on the mapping
+df_long['Industry_legend'] = df_long['Industry'].map(legend_labels)
+
+# Create the selection widgets for start and end months
+start_picker = widgets.SelectionSlider(
+    options=list(df_clean['Month'].dt.to_period('M').astype(str)),
+    description='Start Month',
+    layout=widgets.Layout(width='800px')
+)
+
+end_picker = widgets.SelectionSlider(
+    options=list(df_clean['Month'].dt.to_period('M').astype(str)),
+    description='End Month',
+    layout=widgets.Layout(width='800px')
+)
+
+# Explicitly define the desired order of industries for the legend
+ordered_industries = [
+    'Manufacturing',
+    'Utilities & Construction',
+    'Retail trade',
+    'Transportation and warehousing',
+    'Health, Education & Leisure',
+    'Information & Finance'
+]
+
+# Create the stacked area chart using original Employment values (stacking them)
+area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
+    x=alt.X('Month:T', title='Year'),
+    y=alt.Y('Employment:Q', stack='zero', title='Employment (Thousands)'),  # stack='zero' for stacked area chart
+    color=alt.Color('Industry_legend:N', scale=alt.Scale(domain=ordered_industries, range=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'])),
+    tooltip=['Month:T', 'Industry_legend:N', 'Employment:Q']
+).properties(
+    width=800,
+    height=400,
+    title='Stacked Employment Trend by Industry (2013–2023)'
+)
+
+# Adjust the legend position to be outside the plot and order it
+area_stack_chart = area_stack_chart.configure_legend(
+    orient='top',  # Legend at the top of the plot
+    direction='horizontal',  # Horizontal legend
+    title=None,  # No title for the legend
+    offset=20,  # Adjust spacing between the chart and the legend
+    padding=10,  # Add padding inside the legend box
+    labelFontSize=12,  # Set the font size of the legend labels
+)
+
+# Display the chart and the widgets
+display(area_stack_chart)
+
+```
+
+<small>Figure 3: Employment Trend by Industry(2013-2023)</small>
+
+# What factors have contributed to these trends?
+
+---
+
+#### Market Dynamics
+
+- 2013–2024: Imports maintained a price advantage over domestic products.
+
+- Imported goods share rose, reflecting competitive pressure on U.S. manufacturing.
+
+- Growth in imports outpaced domestic manufacturing output, especially between 2019–2021.
+
+- Changing price dynamics, market expansion, and procurement preferences reshaped competition.
+  
+---
+
+#### Policy and Enterprise Dynamics
+
+```{python}
+import pandas as pd
+import altair as alt
+import numpy as np
+
+df = pd.read_csv("../data/Processed/efficiency_productivity/efficiency_productivity.csv")
+
+# compute yearly average labor productivity and efficiency(producer)
+df['Date'] = pd.to_datetime(df['Date'])
+df['Year'] = df['Date'].dt.year
+df_year = df.groupby('Year', as_index=False)[['Labor productivity','Unit labor costs']].mean()
+
+df_estb = pd.read_csv("../data/Processed/num_private_establishment_count.csv")
+
+# convert quarter data to year data. aggregate method: mean
+df_estb['Year'] = df_estb['YearQuarter'].str[:4].astype(int)
+df_estb_annual = (df_estb.groupby('Year', as_index=False)['num_private_establishment_count'].mean().rename(columns={'num_private_establishment_count': 'Average_Establishments'}))
+
+#print(df_estb_annual)
+
+df_growth = df_estb_annual.sort_values('Year').copy()
+df_growth['GrowthPct'] = (
+    df_growth['Average_Establishments']
+      .pct_change()      
+      .mul(100)         
+      .round(2)
+)
+
+df_growth['GrowthPct'] = df_growth['GrowthPct'].fillna(0)
+
+# build the dataframe for policy bar
+policies = pd.DataFrame([
+    {'Year':'2014', 'policy':'Manufacturing USA'},
+    {'Year':'2017', 'policy':'Manufacturing Extension Partnership Revamp'},
+    {'Year':'2018', 'policy':'Tariff Implementation'},
+    {'Year':'2021', 'policy':'Executive Order 14005'},
+    {'Year':'2022', 'policy':'National Strategy for Advanced Manufacturing'},
+])
+
+policies = policies.astype({'Year':'int32'})  
+color_scale = alt.Scale(
+    domain = policies['policy'].tolist(),
+    range=['#d40537', '#ff4500', '#5f0922', '#ffa207', '#3d6069']
+)
+
+# adjusment
+'''
+# policy bar
+years = list(range(2013, 2025))
+policy_bars = (
+    alt.Chart(policies)
+      .mark_rule(strokeWidth=2, opacity=0.6)      
+      .encode(
+        x=alt.X('Year:O', scale = alt.Scale(domain=years), axis=alt.Axis(title=None, grid = True, labelAngle=0)),
+        color=alt.Color('policy:N', scale=color_scale, legend=alt.Legend(
+                            title= None,
+                            orient='bottom',    
+                            symbolSize=70,      
+                            labelFontSize=10,
+                            labelLimit=300
+                            # values=[
+                            #     'Manufacturing USA',
+                            #     'Manufacturing Extension Partnership Revamp',
+                            #     'Tariff Implementation',
+                            #     'Executive Order 14005',
+                            #     'National Strategy for Advanced Manufacturing']    
+                        )
+            )
+      )
+).properties(width = 800, height = 50, title="Policy Timeline")
+'''
+# Year slider
+year_slider = alt.param(
+    name='year_sel',
+    bind=alt.binding_range(
+        name='Show up to Year: ',
+        min=int(df_year['Year'].min()),
+        max=int(df_year['Year'].max()),
+        step=1
+    ),
+    value=int(df_year['Year'].min())
+)
+
+# Bubble chart: Year vs Unit Labor Costs
+years = list(range(2013, 2025))
+
+manual_rules = (
+    alt.Chart(policies)
+      .mark_rule(strokeWidth=2, opacity=0.6)
+      .encode(
+          x=alt.X('Year:O',scale=alt.Scale(domain=years)),
+          color=alt.Color('policy:N',scale=color_scale,legend=None)
+          )
+      .properties(height=200, width=800)
+)
+
+bubbles = alt.Chart(df_year).transform_filter("datum.Year <= year_sel").mark_circle(size=800).encode(
+    x=alt.X('Year:O', title='Year', scale=alt.Scale(domain=years), axis=alt.Axis(labelAngle=0)),
+    y=alt.Y('Unit labor costs:Q', title='Unit Labor Costs (Index, 2017 = 100)', 
+            scale=alt.Scale(domain=[60, 150]), axis=alt.Axis(grid=False)),
+    color=alt.Color('Labor productivity:Q',
+                    scale=alt.Scale(
+                        domain=[df_year['Labor productivity'].min(), df_year['Labor productivity'].max()],
+                        scheme='redblue'  # Divergent color scheme: red (low) -> blue (high)
+                    ),
+                    legend=alt.Legend(
+                        title='Labor Productivity (Index, 2017 = 100)',
+                        titleLimit=500,
+                        orient="bottom",
+                        direction="horizontal"
+                    )
+                ),
+    tooltip=[
+      alt.Tooltip('Year:O'),
+      alt.Tooltip('Unit labor costs:Q', title='Unit Labor Costs', format='.2f'),
+      alt.Tooltip('Labor productivity:Q', title='Labor Productivity', format='.2f'),
+    ]
+).properties(width=800, height=200, title='Bubble Chart: Labor Productivity and Unit Labor Costs')
+
+bubble_chart = alt.layer(bubbles, manual_rules)
+
+# Line chart for growth %
+years = list(range(2013, 2025))
+
+# For growth chart (with legend)
+manual_rules_growth = (
+    alt.Chart(policies)
+      .mark_rule(strokeWidth=2, opacity=0.6)
+      .encode(
+          x=alt.X('Year:O', scale=alt.Scale(domain=years)),
+          color=alt.Color('policy:N', scale=color_scale, legend=alt.Legend(
+              title=None,
+              orient='top',
+              symbolSize=70,
+              labelFontSize=10,
+              labelLimit=300
+          ))
+      )
+      .properties(height=200, width=800)
+)
+
+# For bubble chart (without legend)
+manual_rules_bubble = (
+    alt.Chart(policies)
+      .mark_rule(strokeWidth=2, opacity=0.6)
+      .encode(
+          x=alt.X('Year:O', scale=alt.Scale(domain=years)),
+          color=alt.Color('policy:N', scale=color_scale, legend=None)
+      )
+      .properties(height=200, width=800)
+)
+
+
+
+base_growth = (
+    alt.Chart(df_growth)
+       .transform_filter("datum.Year <= year_sel")
+       .encode(
+           x=alt.X('Year:O', title='Year', scale=alt.Scale(domain=years), axis=alt.Axis(labelAngle=0)),
+           y=alt.Y('GrowthPct:Q', title='Annual Growth Rate (%)', scale=alt.Scale(domain=[0, 6]), axis=alt.Axis(grid=False)),
+           tooltip=[
+               alt.Tooltip('Year:O'),
+               alt.Tooltip('GrowthPct:Q', title='Growth Rate (%)')
+           ]
+       )
+)
+line_growth = base_growth.mark_line(color='steelblue', strokeWidth=2)
+points_growth = base_growth.mark_point(color='steelblue', size=80)
+growth_chart = alt.layer(line_growth + points_growth + manual_rules_growth).properties(
+        height=100,
+        width=800,
+        title='Private Establishment Annual Growth Rate'
+    )
+
+
+# Vertical bar chart with annotation, no axis labels or ticks
+bar_base = alt.Chart(df_estb_annual).transform_filter("datum.Year == year_sel")
+
+bar = bar_base.mark_bar(color='steelblue').encode(
+    x=alt.X('Year:O', title=None, axis=alt.Axis(ticks=False, labels=True, labelAngle=0)),
+    y=alt.Y('Average_Establishments:Q', title='Average Private Establishments (Thousands)', axis=alt.Axis(
+                orient='right',      
+                titleAngle=90,       
+                titleAlign='center',
+                labels=False,
+                ticks=False,
+            ), scale=alt.Scale(domain=[0, 420000])),
+)
+
+bar_text = bar_base.mark_text(
+    align='center', baseline='bottom', dy=-5
+).encode(
+    x=alt.X('Year:O', axis=alt.Axis(labelAngle=0)),
+    y='Average_Establishments:Q',
+    text=alt.Text('Average_Establishments:Q', format=',.0f')
+)
+
+bar_chart = (bar + bar_text).properties(
+    width=30,
+    height=450,
+    )
+
+# caption
+caption = alt.Chart(pd.DataFrame({'text': ["Note: Index values are relative to 2017 = 100. Values above 100 indicate an increase compared to 2017, and values below 100 indicate a decrease."]})).mark_text(
+    align='center',
+    fontSize=12,
+    dy=10  # move slightly downward
+).encode(
+    text='text'
+).properties(width=850)
+
+# Final layout: bubble chart + growth chart stacked, bar chart to the right
+chart = alt.vconcat(
+    alt.hconcat(
+        alt.vconcat(growth_chart, bubble_chart)
+        .resolve_legend(color='independent', size='independent'),
+        bar_chart
+    ),
+    caption
+).add_params(
+    year_slider
+).properties(
+    title=alt.TitleParams(
+        text='Evolution of Efficiency, Cost, and Scale in U.S. Manufacturing Enterprises (2013-2024)',  
+        fontSize=16,      
+        anchor='middle'
+    )
+)
+
+
+chart
+```
+
+<small>Figure 5:Evolution of Efficiency, Cost, and Scale in U.S. Manufacturing Enterprises (2013-2024)</small>
+
+---
+
+#### Workforce Conditions
+
+- Significant shifts in workforce: Hourly earnings and total compensation increased post-2020.
+
+- Total compensation growth outpaced base earnings, highlighting changing workforce demands.
+
+- Despite employment rebound post-pandemic, growth slowed post-2022.
+
+- Slowing establishment growth despite low unemployment suggests deeper structural challenges.
+
+
+# Conclusion
+
+---
+
+- Decline in significance: U.S. manufacturing’s role, both globally and domestically, has decreased.
+- Imports gained a larger share of the U.S. market due to price advantages, especially post-2020.
+- Short-term policy success, but long-term structural challenges remain.
+- Labor costs surged post-2020, adding pressure on enterprises despite some employment recovery.
+- Future success hinges on transformations in labor practices, cost efficiency, supply chain strategies, and innovation.
+
+# Thank You 

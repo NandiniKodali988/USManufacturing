@@ -1,17 +1,19 @@
 ---
 title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
-format: revealjs
-revealjs:
-  scroll: true
-  embed: true  # Embed all resources (images, CSS) directly in the HTML
-output-dir: website  # Define the output directory for slides
-assets: img  # Ensure the 'img' folder is included in the output directory
+format: 
+    revealjs
+embed-resources: true
+
+
+output-dir: _site  # Specify the output directory for the rendered slides
+assets: img  # Ensure the 'img' folder is included
 ---
 
 
 ## The News Reported That...
 
-<img src="news.png" width="20%" />
+<img src="news.png" width="20%" style="display: block; margin-left: auto; margin-right: auto;" />
+
 
 
 
@@ -22,30 +24,43 @@ assets: img  # Ensure the 'img' folder is included in the output directory
 
 ```{python}
 import pandas as pd
+import altair as alt
 import plotly.express as px
+import json
+import numpy as np
 df = pd.read_csv("../data/raw/manufacturing-value-added-to-gdp.csv")
-# rename the GDP column for convenience
 df = df.rename(columns={"Manufacturing, value added (% of GDP)": "ManufacturingGDP"})
 df = df[(df['Year'] >= 2013) & (df['Year'] <= 2024)]
+
 df = df.dropna(subset=['Code']).reset_index(drop=True)
-df_filtered = df[(df["Year"] >= 2013) & (df["Year"] <= 2024)]
+
 # Create animated choropleth map
 fig = px.choropleth(
-    df_filtered,
+    df,
     locations="Entity",
-    locationmode="country names",   # Use full country names
+    locationmode="country names",   
     color="ManufacturingGDP",
     hover_name="Entity",
     animation_frame="Year",
-    color_continuous_scale="Blues",
-    range_color=[0, 40],            # Adjust range if needed
-    title="Manufacturing as % of GDP by Country (2013–2024)"
+    #color_continuous_scale="purples",
+    color_continuous_scale=[
+    (0.0, "#f2f0f7"),  # very light
+    (0.2, "#cbc9e2"),  # light
+    (0.4, "#9e9ac8"),  # mid
+    (0.6, "#756bb1"),  # darker
+    (0.8, "#54278f"),  # very dark
+    (1.0, "#3f007d")   # darkest
+],
+    range_color=[0, 40],            
 )
+
 fig.update_layout(
     geo=dict(showframe=False, showcoastlines=False),
     coloraxis_colorbar=dict(title="% of GDP")
 )
+
 fig.show()
+
 ```
 
 <small>Figure 1: Manufacturing as a Percentage of GDP by Country (2013–2024)</small>
@@ -99,8 +114,8 @@ df_grouped_filtered["Color"] = df_grouped_filtered["Group"].apply(
 
 # Step 3: Define color map (blue for Manufacturing, gray for others)
 color_map = {
-    "Manufacturing": "steelblue",
-    "Other": "lightgray"
+    "Manufacturing": "#28293D",
+    "Other": "#9997bc"
 }
 
 fig = px.bar(
@@ -111,27 +126,34 @@ fig = px.bar(
     animation_frame="Year",
     orientation='h',
     color_discrete_map=color_map,
-    title="Group-Level Output Race Over Time (2013–2024)",
-    hover_data={"Color": False}  # hide 'Color' in tooltip
+    hover_data={"Color": False}  
 )
 
 # Set custom tooltip on static traces (initial frame)
 for trace in fig.data:
-    trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion USD): %{x:.2f}<extra></extra>"
+    trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion $): %{x:.2f}<extra></extra>"
 
 # Set custom tooltip on animated frames
 for frame in fig.frames:
     for trace in frame.data:
-        trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion USD): %{x:.2f}<extra></extra>"
+        trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion $): %{x:.2f}<extra></extra>"
 
-# Layout settings
 fig.update_layout(
     showlegend=False,
     xaxis=dict(
-        title="Output (Trillions USD)",
+        title="Output (Trillions $)",
         tickformat=".2f",
-        range=[0, 12.5]
+        range=[0, 12.5],
+        showgrid=False,  # Turn off vertical grid lines
+        zeroline=False   # Turn off the thick zero line
     ),
+    yaxis=dict(
+        title = "Sectors",
+        showgrid=False,  # Turn off horizontal grid lines
+        zeroline=False
+    ),
+    plot_bgcolor='white',   # Plot area background
+    paper_bgcolor='white',  # Entire figure background
     margin=dict(t=40, l=100, r=40, b=40)
 )
 
@@ -186,7 +208,19 @@ df_long = df_clean.melt(
 # Add custom legend labels based on the mapping
 df_long['Industry_legend'] = df_long['Industry'].map(legend_labels)
 
-# Create the selection widgets for start and end months
+# Add stack order: higher number = stacked higher (Manufacturing on top)
+stack_order = {
+    'Manufacturing': 0,
+    'Utilities & Construction': 1,
+    'Retail trade': 2,
+    'Transportation and warehousing': 3,
+    'Health, Education & Leisure': 4,
+    'Information & Finance': 5
+}
+
+df_long['stack_order'] = df_long['Industry_legend'].map(stack_order)
+
+# Selection widgets (not actively filtering the chart here, but kept for future interactivity)
 start_picker = widgets.SelectionSlider(
     options=list(df_clean['Month'].dt.to_period('M').astype(str)),
     description='Start Month',
@@ -199,7 +233,7 @@ end_picker = widgets.SelectionSlider(
     layout=widgets.Layout(width='800px')
 )
 
-# Explicitly define the desired order of industries for the legend
+# Explicit industry order
 ordered_industries = [
     'Manufacturing',
     'Utilities & Construction',
@@ -209,31 +243,52 @@ ordered_industries = [
     'Information & Finance'
 ]
 
-# Create the stacked area chart using original Employment values (stacking them)
+# Create stacked area chart
 area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
-    x=alt.X('Month:T', title='Year'),
-    y=alt.Y('Employment:Q', stack='zero', title='Employment (Thousands)'),  # stack='zero' for stacked area chart
-    color=alt.Color('Industry_legend:N', scale=alt.Scale(domain=ordered_industries, range=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'])),
-    tooltip=['Month:T', 'Industry_legend:N', 'Employment:Q']
+    x=alt.X('Month:T',
+            title='Year',
+            axis=alt.Axis(
+                format='%Y',
+                grid=False,
+                labelExpr="timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : ''"
+            )),
+    y=alt.Y('Employment:Q',
+            stack='zero',
+            title='Employment (Thousands)',
+            axis=alt.Axis(grid=False)),
+    color=alt.Color(
+        'Industry_legend:N',
+        scale=alt.Scale(
+            domain=ordered_industries,
+            range=['#3f007d', '#54278f', '#756bb1', '#9e9ac8', '#cbc9e2', '#f2f0f7']
+  # Use built-in purples palette
+        )
+    ),
+    order=alt.Order('stack_order:Q'),
+    tooltip=[
+        alt.Tooltip('Month:T', title='Year', format='%Y'),
+        alt.Tooltip('Month:T', title='Quarter', timeUnit='quarter'),
+        alt.Tooltip('Industry_legend:N', title='Industry'),
+        alt.Tooltip('Employment:Q', title='Employment')
+    ]
 ).properties(
-    width=800,
+    width='container',
     height=400,
     title='Stacked Employment Trend by Industry (2013–2023)'
 )
 
-# Adjust the legend position to be outside the plot and order it
+# Legend styling
 area_stack_chart = area_stack_chart.configure_legend(
-    orient='top',  # Legend at the top of the plot
-    direction='horizontal',  # Horizontal legend
-    title=None,  # No title for the legend
-    offset=20,  # Adjust spacing between the chart and the legend
-    padding=10,  # Add padding inside the legend box
-    labelFontSize=12,  # Set the font size of the legend labels
+    orient='top',
+    direction='horizontal',
+    title=None,
+    offset=40,
+    padding=20,
+    labelFontSize=12
 )
 
-# Display the chart and the widgets
+# Display the chart
 display(area_stack_chart)
-
 ```
 
 <small>Figure 3: Employment Trend by Industry(2013-2023)</small>

@@ -1,12 +1,17 @@
 ---
 title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
 format: revealjs
-output-dir: slides  # Link to your custom CSS file
-embed: true
+revealjs:
+  scroll: true
+  embed: true  # Embed all resources (images, CSS) directly in the HTML
+output-dir: website  # Define the output directory for slides
+assets: img  # Ensure the 'img' folder is included in the output directory
 ---
+
 
 ## The News Reported That...
 
+<img src="news.png" width="20%" />
 
 
 
@@ -239,14 +244,162 @@ display(area_stack_chart)
 
 #### Market Dynamics
 
-- 2013–2024: Imports maintained a price advantage over domestic products.
+```{python}
+import pandas as pd
+import altair as alt
 
-- Imported goods share rose, reflecting competitive pressure on U.S. manufacturing.
+df_ppi = pd.read_csv("../data/Processed/price_index/producer_price_index.csv", parse_dates=['YearMonth'])
+df_ipi = pd.read_csv("../data/Processed/price_index/import_price_index.csv", parse_dates=['YearMonth'])
 
-- Growth in imports outpaced domestic manufacturing output, especially between 2019–2021.
+# convert to quarter data
+df_ipi_q = df_ipi.set_index('YearMonth')['import_price_index'].resample('Q').mean().reset_index(name='ImportPI')
+df_ppi_q = df_ppi.set_index('YearMonth')['producer_price_index'].resample('Q').mean().reset_index(name='ProducerPI')
+df_merge = pd.merge(df_ipi_q, df_ppi_q, how = "outer", on = "YearMonth")
 
-- Changing price dynamics, market expansion, and procurement preferences reshaped competition.
-  
+# compute price difference(import - domestic)
+df_merge['PriceDiff'] = df_merge['ImportPI'] - df_merge['ProducerPI']
+
+# rename for easy merge
+df_merge = df_merge.rename(columns = {'YearMonth': 'Date'})
+df_merge['Date'] = (pd.PeriodIndex(df_merge['Date'], freq='Q').to_timestamp(how='start'))
+
+# prepare dataframe
+df_imp = pd.read_csv('../data/Processed/import_domestic/import.csv', names=['Quarter','Import_Value'],skiprows=1)
+df_dmst  = pd.read_csv('../data/Processed/import_domestic/domestic_gross_output.csv', names=['Quarter','Domestic_Gross_Output_Value'],skiprows=1)
+
+df = df_imp.merge(df_dmst, on='Quarter')
+df['Date'] = pd.PeriodIndex(df['Quarter'], freq='Q').to_timestamp()
+df['Share']   = df['Import_Value'] / (df['Import_Value'] + df['Domestic_Gross_Output_Value']) * 100
+df = pd.merge(df, df_merge, how = "left", on = 'Date')
+
+
+# Add dummy IPI - PPI difference for demo (replace with real 'PriceDiff')
+df['PriceDiff'] = df_merge['PriceDiff'] 
+
+# Reshape bar chart data
+df_bar = df.melt(
+    id_vars=['Date'],
+    value_vars=['Domestic_Gross_Output_Value', 'Import_Value'],
+    var_name='Type',
+    value_name='Amount'
+)
+
+df_bar['Type'] = df_bar['Type'].replace({
+    'Domestic_Gross_Output_Value': 'Domestic Output',
+    'Import_Value': 'Import Value'   
+})
+
+# plot
+
+# build the brush
+brush = alt.selection_interval(encodings=['x'])
+
+# line chart(ipi- ppi)
+base = alt.Chart(df).encode(x=alt.X('Date:T', title="Year", axis=alt.Axis(grid=True)),
+                            tooltip=[
+              alt.Tooltip('Date:T', title='Year', format='%Y'),
+              alt.Tooltip('Date:T', title='Quarter', timeUnit='quarter'),
+              alt.Tooltip('PriceDiff:Q', title='IPI - PPI', format='.2f')])
+
+main_line = base.mark_line(strokeWidth=2).encode(
+    y=alt.Y('PriceDiff:Q', title='IPI - PPI (Index, 1982 = 100)', scale=alt.Scale(domain=[-140, -60]), axis=alt.Axis(grid=True)),
+    color=alt.value("#555184")
+)
+
+main_points = base.mark_point(size=50, filled=True).encode(
+    y='PriceDiff:Q',
+    color=alt.value("#28293D")
+)
+
+'''main_trend = main_line.transform_regression(
+    'Date', 'PriceDiff', method='poly', order=3
+).mark_line(color='red', strokeDash=[4,2], strokeWidth=2)'''
+
+main_chart = alt.layer(main_line, main_points).add_params(
+    brush
+).properties(
+    width=900,
+    height=250,
+    title='Difference Between the Manufacturing Import Price Index and the Producer Price Index'
+)
+
+# bar chart
+bar_chart = alt.Chart(df_bar).transform_filter(
+    brush
+).mark_bar().encode(
+    x=alt.X('Date:T', title="Year", axis=alt.Axis(format='%Y', grid=False, labelExpr="timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : ''")),
+    y=alt.Y('Amount:Q', title='Total Value of Goods (Billion $)', axis=alt.Axis(grid=False)),
+    color=alt.Color('Type:N',
+        scale=alt.Scale(domain=['Domestic Output', 'Import Value'],
+                        range=['#9997bc','#555184']),
+                        legend=alt.Legend(orient="top",
+                                          title=None,
+                                          labelFontSize=10,
+                                          offset=10)),
+        tooltip=[
+              alt.Tooltip('Type:N', title='Type'),
+              alt.Tooltip('Date:T', title='Year', format='%Y'),
+              alt.Tooltip('Date:T', title='Quarter', timeUnit='quarter'),
+              alt.Tooltip('Amount:Q', title='Value', format='.2f')]
+        
+).properties(
+    width=420,
+    height=200,
+    title='Total Value of Domestic and Imported Manufactured Goods'
+)
+
+# Import share line chart filtered by brush
+share_base = (
+    alt.Chart(df)
+      .transform_filter(brush)       
+      .encode(
+          x=alt.X('Date:T', title="Year", axis=alt.Axis(format='%Y', grid=True, labelExpr="timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : ''"
+                  )),
+          y=alt.Y('Share:Q', title='Share of Import Goods Value (%)', scale=alt.Scale(domain=[0,10]), axis=alt.Axis(grid=True)),
+          tooltip=[
+              alt.Tooltip('Date:T', title='Year', format='%Y'),
+              alt.Tooltip('Date:T', title='Quarter', timeUnit='quarter'),
+              alt.Tooltip('Share:Q', title='Import Share (%)', format='.2f')
+          ]
+      )
+)
+
+line = share_base.mark_line(strokeWidth=2).encode(color=alt.value("#555184"))
+points = share_base.mark_point(size=20, filled=True).encode(color=alt.value("#28293D"))
+
+share_line = (
+    (line + points)
+      .properties(
+         width=420, 
+         height=200, 
+         title='Share of Imported Goods Value in Manufacturing'
+      )
+)
+# caption
+caption = alt.Chart(pd.DataFrame({
+    'text': ["Note: The IPI and PPI indexes are standardized to 1982=100. Values represent percentage differences relative to the 1982 base year."]
+})).mark_text(
+    align='center',
+    fontSize=10,
+    fontWeight="bold",
+    dy=10  
+).encode(
+    text='text'
+).properties(width=850)
+
+
+popup = alt.concat(bar_chart, share_line).resolve_legend(
+    color='independent',
+    size='independent')
+final_chart = alt.vconcat(alt.vconcat(main_chart, popup), caption, spacing = 10).properties(title = alt.TitleParams(text="Evolution of Prices, Import Scale, and Market Share in U.S. Manufacturing (2013-2024)", anchor="middle", fontSize=16)).resolve_legend(
+    color='independent',
+    size='independent')
+
+final_chart
+```
+
+<small>Figure 5:Evolution of Efficiency, Cost, and Scale in U.S. Manufacturing Enterprises (2013-2024)</small>
+
 ---
 
 #### Policy and Enterprise Dynamics
@@ -293,7 +446,11 @@ policies = pd.DataFrame([
 policies = policies.astype({'Year':'int32'})  
 color_scale = alt.Scale(
     domain = policies['policy'].tolist(),
-    range=['#d40537', '#ff4500', '#5f0922', '#ffa207', '#3d6069']
+    range=["#5D3C64",
+    "#7B466A",
+    "#9F6496",
+    "#D391B0",
+    "#BA6E8F"]
 )
 
 # adjusment
@@ -339,7 +496,7 @@ years = list(range(2013, 2025))
 
 manual_rules = (
     alt.Chart(policies)
-      .mark_rule(strokeWidth=2, opacity=0.6)
+      .mark_rule(strokeWidth=6, opacity=0.6)
       .encode(
           x=alt.X('Year:O',scale=alt.Scale(domain=years)),
           color=alt.Color('policy:N',scale=color_scale,legend=None)
@@ -347,20 +504,26 @@ manual_rules = (
       .properties(height=200, width=800)
 )
 
-bubbles = alt.Chart(df_year).transform_filter("datum.Year <= year_sel").mark_circle(size=800).encode(
+bubbles = alt.Chart(df_year).transform_filter("datum.Year <= year_sel").mark_circle(size=650).encode(
     x=alt.X('Year:O', title='Year', scale=alt.Scale(domain=years), axis=alt.Axis(labelAngle=0)),
     y=alt.Y('Unit labor costs:Q', title='Unit Labor Costs (Index, 2017 = 100)', 
             scale=alt.Scale(domain=[60, 150]), axis=alt.Axis(grid=False)),
     color=alt.Color('Labor productivity:Q',
                     scale=alt.Scale(
                         domain=[df_year['Labor productivity'].min(), df_year['Labor productivity'].max()],
-                        scheme='redblue'  # Divergent color scheme: red (low) -> blue (high)
+                        scheme='purples'  # Divergent color scheme: red (low) -> blue (high)
                     ),
                     legend=alt.Legend(
                         title='Labor Productivity (Index, 2017 = 100)',
+                        titleFontSize=10,
                         titleLimit=500,
                         orient="bottom",
-                        direction="horizontal"
+                        direction="horizontal",
+                        offset=10,
+                        gradientLength=800,      
+                        gradientThickness=10,  
+                        format='.1f',        
+                        tickCount=10
                     )
                 ),
     tooltip=[
@@ -378,30 +541,32 @@ years = list(range(2013, 2025))
 # For growth chart (with legend)
 manual_rules_growth = (
     alt.Chart(policies)
-      .mark_rule(strokeWidth=2, opacity=0.6)
+      .mark_rule(strokeWidth=6, opacity=0.6)
       .encode(
           x=alt.X('Year:O', scale=alt.Scale(domain=years)),
           color=alt.Color('policy:N', scale=color_scale, legend=alt.Legend(
               title=None,
               orient='top',
               symbolSize=70,
-              labelFontSize=10,
-              labelLimit=300
+              labelFontSize=9.2,
+              labelFontWeight='bold',
+              labelLimit=300,
+              offset=10
           ))
       )
       .properties(height=200, width=800)
 )
 
 # For bubble chart (without legend)
-manual_rules_bubble = (
-    alt.Chart(policies)
-      .mark_rule(strokeWidth=2, opacity=0.6)
-      .encode(
-          x=alt.X('Year:O', scale=alt.Scale(domain=years)),
-          color=alt.Color('policy:N', scale=color_scale, legend=None)
-      )
-      .properties(height=200, width=800)
-)
+# manual_rules_bubble = (
+#     alt.Chart(policies)
+#       .mark_rule(strokeWidth=2, opacity=0.3)
+#       .encode(
+#           x=alt.X('Year:O', scale=alt.Scale(domain=years)),
+#           color=alt.Color('policy:N', scale=color_scale, legend=None)
+#       )
+#       .properties(height=200, width=800)
+# )
 
 
 
@@ -417,9 +582,9 @@ base_growth = (
            ]
        )
 )
-line_growth = base_growth.mark_line(color='steelblue', strokeWidth=2)
-points_growth = base_growth.mark_point(color='steelblue', size=80)
-growth_chart = alt.layer(line_growth + points_growth + manual_rules_growth).properties(
+line_growth = base_growth.mark_line(strokeWidth=3).encode(color=alt.value("#0c0420"))
+points_growth = base_growth.mark_point(filled=True,size=100).encode(color=alt.value("#0c0420"))
+growth_chart = alt.layer(points_growth + line_growth + manual_rules_growth).properties(
         height=100,
         width=800,
         title='Private Establishment Annual Growth Rate'
@@ -429,7 +594,7 @@ growth_chart = alt.layer(line_growth + points_growth + manual_rules_growth).prop
 # Vertical bar chart with annotation, no axis labels or ticks
 bar_base = alt.Chart(df_estb_annual).transform_filter("datum.Year == year_sel")
 
-bar = bar_base.mark_bar(color='steelblue').encode(
+bar = bar_base.mark_bar(opacity=0.6).encode(
     x=alt.X('Year:O', title=None, axis=alt.Axis(ticks=False, labels=True, labelAngle=0)),
     y=alt.Y('Average_Establishments:Q', title='Average Private Establishments (Thousands)', axis=alt.Axis(
                 orient='right',      
@@ -438,6 +603,7 @@ bar = bar_base.mark_bar(color='steelblue').encode(
                 labels=False,
                 ticks=False,
             ), scale=alt.Scale(domain=[0, 420000])),
+    color= alt.value("#555184")
 )
 
 bar_text = bar_base.mark_text(
@@ -450,13 +616,14 @@ bar_text = bar_base.mark_text(
 
 bar_chart = (bar + bar_text).properties(
     width=30,
-    height=450,
+    height=440,
     )
 
 # caption
 caption = alt.Chart(pd.DataFrame({'text': ["Note: Index values are relative to 2017 = 100. Values above 100 indicate an increase compared to 2017, and values below 100 indicate a decrease."]})).mark_text(
     align='center',
-    fontSize=12,
+    fontSize=10,
+    fontWeight="bold",
     dy=10  # move slightly downward
 ).encode(
     text='text'
@@ -469,7 +636,8 @@ chart = alt.vconcat(
         .resolve_legend(color='independent', size='independent'),
         bar_chart
     ),
-    caption
+    caption,
+    spacing = 11
 ).add_params(
     year_slider
 ).properties(
@@ -490,14 +658,207 @@ chart
 
 #### Workforce Conditions
 
-- Significant shifts in workforce: Hourly earnings and total compensation increased post-2020.
+```{python}
+import pandas as pd
+import altair as alt
 
-- Total compensation growth outpaced base earnings, highlighting changing workforce demands.
+def month_to_quarter(df: pd.DataFrame) -> pd.DataFrame:
 
-- Despite employment rebound post-pandemic, growth slowed post-2022.
+        df2 = df.copy()
+        
+        time_col, value_col = df2.iloc[:2]
 
-- Slowing establishment growth despite low unemployment suggests deeper structural challenges.
+        df2[time_col] = pd.to_datetime(df2[time_col], format="%Y-%m")
 
+        df2["YearQuarter"] = df2[time_col].dt.to_period("Q").astype(str)
+
+        df_q = (df2.groupby("YearQuarter", as_index=False)[value_col].mean())
+
+        return df_q
+
+def extract_year(df: pd.DataFrame) -> pd.DataFrame:
+
+        df2 = df.copy()
+        df2[['Year', 'Q']] = df2['YearQuarter'].str.extract(r'(\d{4})Q([1-4])')
+
+        df2['Year'] = df2['Year'].astype(int)
+        df2['Q']    = df2['Q'].astype(int)
+
+        df2['QuarterStart'] = pd.to_datetime(df2['Year'].astype(str) + '-' + ((df2['Q'] - 1) * 3 + 1).astype(str) + '-01')
+
+        df2 = df2.drop("YearQuarter", axis=1)
+       
+        return df2
+
+# prepare the data for drawing parallel coordinate
+import pandas as pd
+pd.Series.iteritems = pd.Series.items # bug repair
+import altair as alt
+
+# wage_hour data(parallel coordinate)
+df_avg_earnings_annual = pd.read_csv("../data/Processed/selected_data_for_worker/wage_hour/avg_hourly_earnings_dollars_annual.csv")
+df_avg_work_hours_annual = pd.read_csv("../data/Processed/selected_data_for_worker/wage_hour/avg_weekly_work_hours_annual.csv")
+df_compensation_hour_annual = pd.read_csv("../data/Processed/selected_data_for_worker/wage_hour/priv_total_compensation_cost_dollars_per_hour_annual.csv")
+df_salary_hour_annual = pd.read_csv("../data/Processed/selected_data_for_worker/wage_hour/priv_wage_salaries_cost_dollars_per_hour_annual.csv")
+
+df_wage_hour = (
+    df_avg_earnings_annual
+    .merge(df_avg_work_hours_annual, on='Year', how='outer')
+    .merge(df_compensation_hour_annual, on='Year', how='outer')
+    .merge(df_salary_hour_annual,  on='Year', how='outer')
+)
+
+# further process for altair
+df_long = df_wage_hour.melt(
+    id_vars=['Year'],
+    value_vars=[
+        'avg_hourly_earnings_dollars_annual_mean',
+        'avg_weekly_work_hours_annual_mean',
+        'priv_total_compensation_cost_dollars_per_hour_Estimate Value_annual_mean',
+        'priv_wage_salaries_cost_dollars_per_hour_Estimate Value_annual_mean'
+    ],
+    var_name='Metric',
+    value_name='Value'
+)
+
+label_map = {
+    'avg_hourly_earnings_dollars_annual_mean': 'Hourly Earnings ($/hr)',
+    'avg_weekly_work_hours_annual_mean':    'Weekly Hours (hr)',
+    'priv_total_compensation_cost_dollars_per_hour_Estimate Value_annual_mean': 'Total Comp ($/hr)',
+    'priv_wage_salaries_cost_dollars_per_hour_Estimate Value_annual_mean':    'Wage Cost ($/hr)'
+}
+df_long['Metric'] = df_long['Metric'].map(label_map)
+df_long['Year'] = df_long['Year'].astype(str)
+
+# employment data(multiple line cahrts)
+df_employ = pd.read_csv("../data/Processed/selected_data_for_worker/employment/all_employees_thousands.csv")
+df_job_open = pd.read_csv("../data/Processed/selected_data_for_worker/employment/job_opennings_thousands.csv")
+df_num_privest_jbg = pd.read_csv("../data/Processed/selected_data_for_worker/employment/num_priv_estab_gross_job_gains_thousands.csv")
+df_num_privest_jbl = pd.read_csv("../data/Processed/selected_data_for_worker/employment/num_priv_estab_gross_job_losses_thousands.csv")
+df_unemploy_rate = pd.read_csv("../data/Processed/selected_data_for_worker/employment/unemployment_rate.csv")
+
+# transform monthly data to quarterly
+df_employ_q = month_to_quarter(df_employ)
+df_job_open = month_to_quarter(df_job_open)
+df_unemploy_rate_q = month_to_quarter(df_unemploy_rate)
+df_employ_q = df_employ_q.iloc[:-3]
+df_job_open = df_job_open.iloc[:-3]
+df_unemploy_rate_q = df_unemploy_rate_q.iloc[:-3]
+
+# modify quarter format of quarterly data
+df_num_privest_jbg['YearQuarter'] = df_num_privest_jbg ['YearQuarter'].str.replace(r'\s+', '', regex=True)
+df_num_privest_jbl['YearQuarter'] = df_num_privest_jbl ['YearQuarter'].str.replace(r'\s+', '', regex=True)
+df_net = pd.merge(df_num_privest_jbg, df_num_privest_jbl, on = 'YearQuarter', how = "outer")
+df_net['net_job_thousands'] = df_net['num_priv_estab_gross_job_gains_thousands'] - df_net['num_priv_estab_gross_job_losses_thousands']
+df_net = df_net[['YearQuarter', 'net_job_thousands']]
+
+#
+df_net = extract_year(df_net)
+
+df_unemploy_rate_q = extract_year(df_unemploy_rate_q)
+
+df_job_open = extract_year(df_job_open)
+
+df_employ_q = extract_year(df_employ_q)
+
+
+# build selector
+years = sorted(df_long['Year'].unique())
+
+start_dd = alt.param(
+    name='start_year',
+    bind=alt.binding_select(options=years, name='Starting Year: '),
+    value=years[0]
+)
+
+end_dd = alt.param(
+    name='end_year',
+    bind=alt.binding_select(options=years, name='Ending Year: '),
+    value=years[-1]
+)
+
+highlight = (alt.datum.Year >= start_dd) & (alt.datum.Year <= end_dd)
+
+# build the parallel
+base = alt.Chart(df_long).add_params(start_dd, end_dd).encode(
+        x=alt.X('Metric:N',title=None,axis=alt.Axis(orient='top', labelAngle=0, grid=True)),
+        y=alt.Y('Value:Q',title=None,scale=alt.Scale(domain=[20,50])),
+        detail='Year:N',               
+        tooltip=['Year:O','Metric:N','Value:Q']
+    )
+
+lines = base.mark_line(interpolate='monotone', strokeWidth=2).encode(
+    color=alt.Color('Year:O', scale=alt.Scale(scheme='purples')),
+    opacity=alt.condition(highlight, alt.value(1.0), alt.value(0.15))
+)
+
+points = base.mark_point(size=60, filled=True).encode(
+    color=alt.Color('Year:O', scale=alt.Scale(scheme='purples')),
+    opacity=alt.condition(highlight, alt.value(1.0), alt.value(0.15))
+)
+
+parallel_coords = (lines + points).properties(
+        width=800,
+        height=250
+    )
+
+# build line charts
+def make_quarter_chart_with_window(df, title, label_x, value_col_name:str):
+
+    min_value = df[value_col_name].min()
+    max_value = df[value_col_name].max()
+
+    highlight = (alt.datum.Year >= start_dd) & (alt.datum.Year <= end_dd)
+
+    bg = alt.Chart(df).add_params(start_dd, end_dd).mark_line(strokeWidth=3, color='lightgray', opacity=1).encode(
+        x=alt.X('QuarterStart:T', title=label_x),
+        y=alt.Y(f'{value_col_name}:Q', title=None, scale=alt.Scale(domain=[min_value*0.9, max_value*1.1]))
+    )
+
+    bg_points = bg.mark_point(color='lightgray', size=20, opacity=1)
+
+    hl = alt.Chart(df).add_params(start_dd, end_dd).transform_filter(highlight).mark_line(strokeWidth=3).encode(
+            x='QuarterStart:T',
+            y=alt.Y(f'{value_col_name}:Q', title=None),
+            color=alt.value("#9997BC")
+    )
+
+    hl_points = (
+        alt.Chart(df)
+        .add_params(start_dd, end_dd)
+        .transform_filter(highlight)
+        .mark_point(size=20,filled=True)
+        .encode(
+            x='QuarterStart:T',
+            y=f'{value_col_name}:Q',
+            color=alt.value("#555184"),
+            tooltip=[
+               alt.Tooltip('QuarterStart:T'),
+               alt.Tooltip(f'{value_col_name}:Q', format='.0f')
+           ]
+        )
+    )
+
+    return alt.layer(bg, bg_points, hl, hl_points).properties(width=400, height=60, title = title)
+
+
+c1 = make_quarter_chart_with_window(df_net, label_x="Year", title="Net Establishment Changes in Job Gains and Losses (Thousands)", value_col_name="net_job_thousands")
+c2 = make_quarter_chart_with_window(df_job_open, label_x="Year", title="Trends in Job Openings in Manufacturing (Thousands)", value_col_name="job_opennings_thousands")
+c3 = make_quarter_chart_with_window(df_employ_q, label_x="Year", title="Trends in Total Employment in Manufacturing (Thousands)", value_col_name="all_employees_thousands")
+c4 = make_quarter_chart_with_window(df_unemploy_rate_q, label_x="Year", title="Trends in Unemployment Rate in Manufacturing (%)", value_col_name="unemployment_rate")
+
+b1 = alt.hconcat(c2, c1)
+b2 = alt.hconcat(c3,c4)
+
+final = alt.vconcat(parallel_coords, b1, b2).properties(title = alt.TitleParams(text="Evolution of Wages, Working Hours, and Employment Conditions of U.S. Manufacturing Workers (2013-2024)", anchor="middle", fontSize=16)).resolve_legend(
+    color='independent',
+    size='independent')
+
+
+final
+```
+
+<small>Figure 6:Evolution of Wages, Working Hours, and Employment Conditions of U.S. Manufacturing Workers (2013-2024)</small>
 
 # Conclusion
 

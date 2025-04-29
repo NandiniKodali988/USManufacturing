@@ -579,7 +579,7 @@ bubbles = alt.Chart(df_year).transform_filter("datum.Year <= year_sel").mark_cir
       alt.Tooltip('Unit labor costs:Q', title='Unit Labor Costs', format='.2f'),
       alt.Tooltip('Labor productivity:Q', title='Labor Productivity', format='.2f'),
     ]
-).properties(width=800, height=200, title='Bubble Chart: Labor Productivity and Unit Labor Costs')
+).properties(width=800, height=200, title='Labor Productivity and Unit Labor Costs')
 
 bubble_chart = alt.layer(bubbles, manual_rules)
 

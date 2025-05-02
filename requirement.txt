@@ -1,0 +1,23 @@
+# Core data manipulation
+pandas==2.2.2
+numpy==1.26.4
+
+# Visualization libraries
+altair==5.1.2
+matplotlib==3.8.4
+plotly==5.21.0
+vega_datasets==0.9.0
+
+# Interactive widgets
+ipywidgets==8.1.2
+ipython==8.24.0
+notebook==7.1.2
+jupyterlab==4.1.5
+
+# Scikit-learn for scaling, preprocessing
+scikit-learn==1.4.2
+
+# JSON handling (built-in to Python, no pip install required)
+# os, json, display are part of the Python standard library — no need to install
+
+# (Optional) Quarto CLI is installed separately from https://quarto.org/

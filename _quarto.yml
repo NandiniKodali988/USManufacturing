@@ -1,11 +1,11 @@
 project:
   type: website  # Defines the project type as a website
-  output-dir: _site  # Directory where rendered files (HTML, assets) will be placed
+  output-dir: website  # Directory where rendered files (HTML, assets) will be placed
   render:
     - website/slides.qmd  # Render Reveal.js slides from this file
-    - website/website.qmd  # Render the main website content (if any)
+    - website/index.qmd  # Render the main website content (if any)
 
 output:
   revealjs:
     embed: true  # Embeds all resources (like images, CSS) in the HTML
-    output-dir: _site  # The Reveal.js slides will be rendered to this directory
+    output-dir: website  # The Reveal.js slides will be rendered to this directory

@@ -320,11 +320,8 @@ While the broader trends reveal that U.S. manufacturing has maintained a stable 
 
 ## Trends in Domestic Market and Import Dynamics
 
-:::{.panel-tabset}
-#### Market Dynamics
 <iframe src="../img/Price_Index.html" width="200%" height="750px" frameborder="0"></iframe>
 
-:::
 
 
 To understand market behavior in U.S. manufacturing, it is essential to consider the relationship between the Import Price Index (IPI) and the Producer Price Index (PPI). Both indices are standardized to a common base year (1982 = 100), allowing for direct comparison. The IPI reflects the average price U.S. manufacturers pay for imported inputs, while the PPI measures the average prices domestic producers receive for goods sold. The difference between these two indices (IPI – PPI) serves as a key indicator of relative cost competitiveness. A more negative gap suggests that imported goods are significantly cheaper than domestically produced alternatives, which can strongly influence sourcing decisions in favor of imports.
@@ -338,11 +335,8 @@ Taken together, these linked visualizations reveal a clear structural challenge 
 
 ## Policy and Enterprise Developments
 
-:::{.panel-tabset}
-#### Policy and Enterprise Developments
 <iframe src="../img/cost_eff_producer.html" width="200%" height="600px" frameborder="0"></iframe>
 
-:::
 
 Building from market dynamics, we now shift from external cost pressures to internal industrial capacity. While pricing advantages drove import growth, policy makers have attempted to strengthen domestic manufacturing through targeted interventions. These include federal initiatives such as Manufacturing USA (2014), the Manufacturing Extension Partnership revamp (2017), tariffs (2018), Executive Order 14005 (2021), and the National Strategy for Advanced Manufacturing (2022).
 
@@ -359,11 +353,7 @@ In summary, the policy landscape has influenced enterprise activity and growth t
 
 ## Workforce Conditions in U.S. Manufacturing
 
-:::{.panel-tabset}
-#### Workforce Conditions in U.S. Manufacturing
 <iframe src="../img/workers.html" width="200%" height="750px" frameborder="0"></iframe>
-
-:::
 
 Building on the previous enterprise-level perspective, which revealed rising unit labor costs and mixed productivity outcomes, we now examine how these structural trends have translated into real-world consequences for manufacturing workers. While policy initiatives aimed to boost output and competitiveness, labor dynamics—wages, job stability, and unemployment—tell a more personal story of uncertainty, resilience, and lingering volatility.
 

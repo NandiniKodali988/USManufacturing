@@ -4,6 +4,17 @@ project:
   render:
     - website/slides.qmd  # Render Reveal.js slides from this file
     - website/index.qmd  # Render the main website content (if any)
+  
+  website:
+  title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
+      - text: "Authors"
+        href: authors.qmd
+      - text: "Data"
+        href: data.qmd
 
 output:
   revealjs:

@@ -4,7 +4,6 @@ authors: "Li-Wen Hu, Nandini Kodali, Ruijie Xu, and Jiahui Liu"
 
 format:
   html:
-    toc: true
     embed-resources: true
     self-contained: true
     output-dir: website
@@ -54,10 +53,10 @@ fig = px.choropleth(
     #color_continuous_scale="purples",
     color_continuous_scale=[
     (0.0, "#f2f0f7"),  # very light
-    (0.2, "#cbc9e2"),  # light
-    (0.4, "#9e9ac8"),  # mid
-    (0.6, "#756bb1"),  # darker
-    (0.8, "#54278f"),  # very dark
+    (0.2, "#cbc9e2"), 
+    (0.4, "#9e9ac8"),  
+    (0.6, "#756bb1"),  
+    (0.8, "#54278f"),  
     (1.0, "#3f007d")   # darkest
 ],
     range_color=[0, 40],            
@@ -71,7 +70,7 @@ fig.update_layout(
 fig.show()
 ```
 
-The animated choropleth map provides a clear visualization of the global distribution of manufacturing’s contribution to GDP between 2013 to 2023. A key observation is the United States has experienced relatively little change in its manufacturing share of GDP during this period, reflecting both resilience and structural stagnation in a highly competitive global landscape. In contrast, East and Southeast Asian countries—particularly China, Vietnam, and others—consistently exhibit a high percentage of manufacturing value added relative to GDP. These regions have benefited from lower labor costs, export-oriented policies, and robust industrial infrastructures, solidifying their position as global manufacturing hubs. While external global competition has undoubtedly exerted pressure on the U.S. manufacturing sector, domestic economic transformations—such as the rise of service-based industries, automation, and shifts in consumer demand—have also reshaped the sector’s trajectory. 
+The animated choropleth map provides a clear visualization of the global distribution of manufacturing’s contribution to GDP from 2013 to 2023. A key observation is that the United States has experienced relatively little change in its manufacturing share of GDP during this period, reflecting both resilience and structural stagnation in a highly competitive global landscape. In contrast, East and Southeast Asian countries—particularly China, Vietnam—consistently exhibit a high percentage of manufacturing value added relative to GDP. These regions have benefited from lower labor costs, export-oriented policies, and robust industrial infrastructures, solidifying their position as global manufacturing hubs. While external global competition has undoubtedly exerted pressure on the U.S. manufacturing sector, domestic economic transformations—such as the rise of service-based industries, increased automation, and shifts in consumer demand—have also reshaped the sector’s trajectory.
 
 ## GDP Race: Manufacturing vs. other Sectors
 
@@ -166,12 +165,11 @@ fig.update_layout(
 fig.show()
 ```
 
-To better contextualize the position of U.S. manufacturing, we turn to a second set of visuals: bar charts displaying output across key domestic sectors over the same period.
+To better contextualize the position of U.S. manufacturing, we turn to a second set of visuals: bar charts illustrating output across key domestic sectors over the same period.
 
-These charts reveal that while manufacturing has shown modest growth in absolute output—from approximately $5.9 trillion in 2013 to over $7 trillion in 2023—it has done so at a slower pace compared to several service-oriented sectors. For instance, “Professional & Public Services” and “Information & Finance” have surged ahead, reflecting the broader transition of the U.S. economy toward knowledge-based and service-dominant industries.
+These charts reveal that while manufacturing has exhibited modest growth in absolute output—from approximately $5.9 trillion in 2013 to over $7 trillion in 2023—it has done so at a slower pace compared to several service-oriented sectors. For instance, “Professional & Public Services” and “Information & Finance” have surged ahead, reflecting the broader shift of the U.S. economy toward knowledge-based and service-dominated industries.
 
-Notably, sectors like “Health, Education & Leisure” and “Trade & Transportation” also witnessed considerable expansion, indicating increased demand driven by demographic shifts and digital commerce. Although manufacturing remains a foundational pillar of economic output, its relative position has been overshadowed by sectors more directly aligned with technological innovation and consumer services. This trend underscores the importance of understanding manufacturing not as an isolated sector, but as one that now operates in an increasingly service-integrated and digitally enabled economy.
-
+Notably, sectors such as “Health, Education & Leisure” and “Trade & Transportation” have also experienced significant expansion, driven by demographic changes and the rise of digital commerce. Although manufacturing remains a foundational pillar of economic output, its relative standing has been increasingly overshadowed by sectors more directly aligned with technological innovation and consumer-driven services. This trend underscores the importance of understanding manufacturing not as an isolated sector, but as one that now operates within an increasingly service-integrated and digitally enabled economy.
 
 ## Employment Race: Manufacturing vs. other Sectors
 
@@ -299,7 +297,7 @@ display(final_chart)
 
 To complement the sectoral output analysis, a stacked area chart illustrating employment trends from 2013 to 2023 offers a valuable labor market perspective. When placed alongside the bar charts that track economic output by sector, this visualization highlights a subtle but important dynamic: while the manufacturing sector has experienced consistent growth in employment, it has not kept pace with the more rapid expansion seen in other industries.
 
-The chart shows a steady upward trend in manufacturing employment across the decade, with only a temporary decline in 2020–2021 likely due to the COVID-19 pandemic. Despite this dip, the recovery was relatively swift. However, the relative proportional share of manufacturing employment within the broader labor force has remained mostly flat. This suggests that while the sector continues to generate jobs, it is doing so at a slower relative rate compared to service-driven sectors like “Health, Education & Leisure” or “Professional & Public Services,” both of which show more significant vertical expansion in the chart.
+The chart shows a steady upward trend in manufacturing employment across the decade, with only a temporary decline in 2020–2021 likely due to the COVID-19 pandemic. Despite this dip, the recovery was relatively swift. However, the relative proportional share of manufacturing employment within the broader labor force has remained mostly flat. This suggests that while the sector continues to generate jobs, it is doing so at a slower pace compared to service-oriented sectors such as Health, Education & Leisure, which exhibit more significant vertical expansion in the visualization.
 
 This visual also reinforces the notion presented in the bar chart: although manufacturing maintains a large absolute footprint, it is being outpaced in growth by sectors aligned with population services, digital infrastructure, and professionalized labor. The convergence of employment and output data underlines the structural transformation of the U.S. economy toward a post-industrial model where manufacturing is stable but no longer dominant in employment or output growth.
 

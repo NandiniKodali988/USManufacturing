@@ -14,4 +14,4 @@ website:
 format:
   html:
     theme: lux
-    toc: true
+

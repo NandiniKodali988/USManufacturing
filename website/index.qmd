@@ -1,9 +1,9 @@
 ---
-title: "US Manufacturing"
+title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
 authors: "Nandini Kodali, Wendy Hu, Ruijie Xu, and Jiahui Liu"
 format:
   html:
-    toc: false
+    toc: true
     embed-resources: true
     self-contained: true
     output-dir: website
@@ -222,6 +222,9 @@ stack_order = {
     'Information & Finance': 5
 }
 df_long['stack_order'] = df_long['Industry_legend'].map(stack_order)
+
+# Filter data to include only years up to 2024
+df_long = df_long[df_long['Month'].dt.year <= 2024]
 
 # Color palette (Manufacturing and Info & Finance swapped)
 ordered_industries = [

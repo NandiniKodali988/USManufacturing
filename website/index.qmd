@@ -11,6 +11,7 @@ execute:
   kernel: python3
   echo: false
 ---
+
 # Introduction
 
 Over the past decade, U.S. manufacturing has undergone a quiet transformation. Once the undisputed engine of economic growth, the sector now competes for attention in a landscape increasingly dominated by service industries, digital platforms, and global supply chains. Yet manufacturing remains essential—not only as a source of high-value output and employment, but also as a strategic asset linked to national resilience, innovation, and trade. This report investigates the evolving role of U.S. manufacturing through two interconnected lenses. First, we assess the sector’s global and domestic positioning by analyzing macro-level trends in output, employment, and competitiveness. Then, we take a closer look through the eyes of buyers, producers, and workers to understand the pressures and responses shaping day-to-day decision-making within the industry. Together, these perspectives offer a comprehensive view of where U.S. manufacturing stands—and where it may be heading.
@@ -177,15 +178,13 @@ Notably, sectors like “Health, Education & Leisure” and “Trade & Transport
 ```{python}
 import pandas as pd
 import altair as alt
-import ipywidgets as widgets
 from IPython.display import display
-from ipywidgets import VBox
 
-# Read data
+# Load data
 df_clean = pd.read_csv("../data/Processed/employment_rate.csv")
 df_clean['Month'] = pd.to_datetime(df_clean['Month'], errors='coerce')
 
-# Original industries to plot
+# Define industries and legend labels
 industries_to_plot = [
     'Manufacturing',
     'Construction',
@@ -195,7 +194,6 @@ industries_to_plot = [
     'Financial activities'
 ]
 
-# Mapping of original industry names to new legend labels
 legend_labels = {
     'Manufacturing': 'Manufacturing',
     'Construction': 'Utilities & Construction',
@@ -205,18 +203,16 @@ legend_labels = {
     'Financial activities': 'Information & Finance'
 }
 
-# Melt data to long format
+# Long format
 df_long = df_clean.melt(
     id_vars=['Month'],
     value_vars=industries_to_plot,
     var_name='Industry',
     value_name='Employment'
 )
-
-# Add custom legend labels based on the mapping
 df_long['Industry_legend'] = df_long['Industry'].map(legend_labels)
 
-# Add stack order: higher number = stacked higher (Manufacturing on top)
+# Stack order
 stack_order = {
     'Manufacturing': 0,
     'Utilities & Construction': 1,
@@ -225,23 +221,9 @@ stack_order = {
     'Health, Education & Leisure': 4,
     'Information & Finance': 5
 }
-
 df_long['stack_order'] = df_long['Industry_legend'].map(stack_order)
 
-# Selection widgets (not actively filtering the chart here, but kept for future interactivity)
-start_picker = widgets.SelectionSlider(
-    options=list(df_clean['Month'].dt.to_period('M').astype(str)),
-    description='Start Month',
-    layout=widgets.Layout(width='800px')
-)
-
-end_picker = widgets.SelectionSlider(
-    options=list(df_clean['Month'].dt.to_period('M').astype(str)),
-    description='End Month',
-    layout=widgets.Layout(width='800px')
-)
-
-# Explicit industry order
+# Color palette (Manufacturing and Info & Finance swapped)
 ordered_industries = [
     'Manufacturing',
     'Utilities & Construction',
@@ -250,8 +232,9 @@ ordered_industries = [
     'Health, Education & Leisure',
     'Information & Finance'
 ]
+custom_colors = ['#653497', '#3d6469', '#5f0922', '#ff4500', '#03c1c2', '#d40537']
 
-# Create stacked area chart
+# Base stacked area chart
 area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
     x=alt.X('Month:T',
             title='Year',
@@ -268,9 +251,9 @@ area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
         'Industry_legend:N',
         scale=alt.Scale(
             domain=ordered_industries,
-            range=['#3f007d', '#54278f', '#756bb1', '#9e9ac8', '#cbc9e2', '#f2f0f7']
-  # Use built-in purples palette
-        )
+            range=custom_colors
+        ),
+        legend=None
     ),
     order=alt.Order('stack_order:Q'),
     tooltip=[
@@ -285,18 +268,30 @@ area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
     title='Stacked Employment Trend by Industry (2013–2023)'
 )
 
-# Legend styling
-area_stack_chart = area_stack_chart.configure_legend(
-    orient='top',
-    direction='horizontal',
-    title=None,
-    offset=40,
-    padding=20,
-    labelFontSize=12
+# --- Create annotations ---
+last_month = df_long['Month'].max()
+df_last = df_long[df_long['Month'] == last_month].copy()
+df_last = df_last.sort_values('stack_order')
+df_last['y0'] = df_last['Employment'].cumsum() - df_last['Employment']
+df_last['y1'] = df_last['Employment'].cumsum()
+df_last['y_mid'] = (df_last['y0'] + df_last['y1']) / 2
+
+annotations = alt.Chart(df_last).mark_text(
+    align='left',
+    baseline='middle',
+    dx=5,
+    color='black'  # force all text to be black
+).encode(
+    x=alt.X('Month:T'),
+    y=alt.Y('y_mid:Q'),
+    text='Industry_legend:N'
 )
 
-# Display the chart
-display(area_stack_chart)
+
+
+# Final chart with labels
+final_chart = (area_stack_chart + annotations).configure_view(stroke=None)
+display(final_chart)
 ```
 
 To complement the sectoral output analysis, a stacked area chart illustrating employment trends from 2013 to 2023 offers a valuable labor market perspective. When placed alongside the bar charts that track economic output by sector, this visualization highlights a subtle but important dynamic: while the manufacturing sector has experienced consistent growth in employment, it has not kept pace with the more rapid expansion seen in other industries.

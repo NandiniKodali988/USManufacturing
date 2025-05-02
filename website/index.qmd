@@ -1,6 +1,7 @@
 ---
 title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
-authors: "Nandini Kodali, Wendy Hu, Ruijie Xu, and Jiahui Liu"
+authors: "Li-Wen Hu, Nandini Kodali, Ruijie Xu, and Jiahui Liu"
+
 format:
   html:
     toc: true

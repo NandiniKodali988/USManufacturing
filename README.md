@@ -83,7 +83,7 @@ The corresponding rendered files are:
 
 You can view either HTML file directly in a browser. 
 
-### ## 📊 Plot Inventory: Views & Plots Breakdown
+### Plot Inventory: Views & Plots Breakdown
 
 This project includes multiple data visualizations organized into five distinct analytical views. One of these views (Market Dynamics) uses coordinated **linked views** to tell a richer interactive story.
 

@@ -1,5 +1,6 @@
 ---
 title: "US Manufacturing"
+authors: "Nandini Kodali, Wendy Hu, Ruijie Xu, and Jiahui Liu"
 format:
   html:
     toc: false
@@ -10,10 +11,6 @@ execute:
   kernel: python3
   echo: false
 ---
-# Team Member
-
-Nandini Kodali, Wendy Hu, Ruijie Xu, Jiahui Liu
-
 # Introduction
 
 Over the past decade, U.S. manufacturing has undergone a quiet transformation. Once the undisputed engine of economic growth, the sector now competes for attention in a landscape increasingly dominated by service industries, digital platforms, and global supply chains. Yet manufacturing remains essential—not only as a source of high-value output and employment, but also as a strategic asset linked to national resilience, innovation, and trade. This report investigates the evolving role of U.S. manufacturing through two interconnected lenses. First, we assess the sector’s global and domestic positioning by analyzing macro-level trends in output, employment, and competitiveness. Then, we take a closer look through the eyes of buyers, producers, and workers to understand the pressures and responses shaping day-to-day decision-making within the industry. Together, these perspectives offer a comprehensive view of where U.S. manufacturing stands—and where it may be heading.

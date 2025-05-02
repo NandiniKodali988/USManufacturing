@@ -4,13 +4,11 @@ project:
      - "*.qmd"
 
 website:
-  title: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
+  title: "DSAN 5200"
   navbar:
     left:
       - href: index.qmd
         text: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
-      - text: "Authors"
-        href: slides.qmd
       - text: "Data"
         href: data.qmd
 format:

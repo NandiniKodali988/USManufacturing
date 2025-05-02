@@ -36,6 +36,8 @@ dsan5200-spring2025-project-group-13/
 │   ├── stacked_area.ipynb                 # Stacked industry employment plot
 │   ├── wage_hour_job_worker.ipynb         # Worker: wages + job conditions
 │   ├── workforce_timeseries.ipynb         # Employment by sector over time
+│   ├── producer_real_output.ipynb         # Producer: pointing to productivity gains.
+│   ├── Import_export.ipynb                # Import and Export trade for us manufacture
 │   └── worldmap.ipynb                     # Choropleth map of GDP share
 │
 │
@@ -57,6 +59,7 @@ The cleaned datasets were saved into the `data/Processed/` directory and served 
 - `data/raw/` – Contains original, unmodified datasets
 - `code/data_cleaning/` – Contains Python scripts for cleaning, transforming, and organizing data
 - `data/Processed/` – Contains cleaned and analysis-ready CSVs used throughout the project
+
 
 ### Core Capabilities
 
@@ -83,11 +86,8 @@ The corresponding rendered files are:
 
 You can view either HTML file directly in a browser. 
 
-### Plot Inventory: Views & Plots Breakdown
 
-This project includes multiple data visualizations organized into five distinct analytical views. One of these views (Market Dynamics) uses coordinated **linked views** to tell a richer interactive story.
-
-### Views Summary
+### Plot Views
 
 1. **Global Manufacturing Comparison**
    - Choropleth map of manufacturing as a % of GDP by country  

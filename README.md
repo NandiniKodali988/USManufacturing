@@ -17,10 +17,13 @@ This project presents an interactive data-driven story exploring the evolution o
 dsan5200-spring2025-project-group-13/
 │
 ├── website/                       # Main website directory
+├── ├──_site/                      # auto-generated HTML output folder
+│      ├── index.html
+│      ├── slides.html
+│      └── data.html
 │   ├── index.qmd                  # Quarto source (main narrative)
-│   ├── index.html                 # Rendered website
+│   ├── data.qmd                   # data format
 │   ├── slides.qmd                 # Optional slides (Quarto)
-│   ├── slides.html
 │   └── news.png                   # Image asset
 │
 ├── code/                          # Jupyter notebooks for visualizations
@@ -78,11 +81,13 @@ The `website/` folder contains all Quarto source files and rendered HTML outputs
 
 - `index.qmd` – The main source file for the full **visual narrative report**
 - `slides.qmd` – A condensed version of the content, formatted as a **presentation deck**
+- `data.qmd` –  A formatted data table that presents part of our data
 
-The corresponding rendered files are:
+The corresponding rendered files in `_site`are:
 
 - `index.html` – Opens the interactive **report-style website**
 - `slides.html` – Opens the **slideshow presentation**
+- `data.html` – Opens the **formatted data table**
 
 You can view either HTML file directly in a browser. 
 

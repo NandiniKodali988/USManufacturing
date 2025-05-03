@@ -26,7 +26,7 @@ In this report, we address three crticial questions:
 industry?
 
 
-# A Big-Picture View of U.S. Manufacturing
+# Overview of U.S. Manufacturing Trends
 
 ## Global Positioning of U.S. Manufacturing (2013–2023)
 
@@ -313,8 +313,9 @@ While the broader trends reveal that U.S. manufacturing has maintained a stable 
 
 ## Trends in Domestic Market and Import Dynamics
 
-<iframe src="../img/Price_Index.html" width="200%" height="750px" frameborder="0"></iframe>
-
+<div style="transform: scale(0.75); transform-origin: top left; width: 1000px; height: 600px;">
+  <iframe src="../img/Price_Index.html" width="1000" height="700" style="border: none;"></iframe>
+</div>
 
 
 To understand market behavior in U.S. manufacturing, it is essential to consider the relationship between the Import Price Index (IPI) and the Producer Price Index (PPI). Both indices are standardized to a common base year (1982 = 100), allowing for direct comparison. The IPI reflects the average price U.S. manufacturers pay for imported inputs, while the PPI measures the average prices domestic producers receive for goods sold. The difference between these two indices (IPI – PPI) serves as a key indicator of relative cost competitiveness. A more negative gap suggests that imported goods are significantly cheaper than domestically produced alternatives, which can strongly influence sourcing decisions in favor of imports.
@@ -328,8 +329,9 @@ Taken together, these linked visualizations reveal a clear structural challenge 
 
 ## Policy and Enterprise Developments
 
-<iframe src="../img/cost_eff_producer.html" width="200%" height="600px" frameborder="0"></iframe>
-
+<div style="transform: scale(0.80); transform-origin: top left; width: 1000px; height: 600px;">
+  <iframe src="../img/cost_eff_producer.html" width="1000" height="600" style="border: none;"></iframe>
+</div>
 
 Building from market dynamics, we now shift from external cost pressures to internal industrial capacity. While pricing advantages drove import growth, policy makers have attempted to strengthen domestic manufacturing through targeted interventions. These include federal initiatives such as Manufacturing USA (2014), the Manufacturing Extension Partnership revamp (2017), tariffs (2018), Executive Order 14005 (2021), and the National Strategy for Advanced Manufacturing (2022).
 
@@ -346,7 +348,9 @@ In summary, the policy landscape has influenced enterprise activity and growth t
 
 ## Workforce Conditions in U.S. Manufacturing
 
-<iframe src="../img/workers.html" width="200%" height="750px" frameborder="0"></iframe>
+<div style="transform: scale(0.70); transform-origin: top left; width: 1400px; height: 600px;">
+  <iframe src="../img/workers.html" width="1200" height="800" style="border: none;"></iframe>
+</div>
 
 Building on the previous enterprise-level perspective, which revealed rising unit labor costs and mixed productivity outcomes, we now examine how these structural trends have translated into real-world consequences for manufacturing workers. While policy initiatives aimed to boost output and competitiveness, labor dynamics—wages, job stability, and unemployment—tell a more personal story of uncertainty, resilience, and lingering volatility.
 
@@ -370,7 +374,7 @@ From the worker’s perspective, wage levels and compensation have generally imp
 
 Together, these perspectives reveal a manufacturing sector facing rising internal costs, global competition, and fragile labor dynamics—where policy can help, but systemic shifts in technology, workforce investment, and innovation are essential for long-term resilience.
 
-# Responses to Analytical Questions
+# Conclusion 
 
 1. How does the U.S. manufacturing industry experience overall growth or decline in recent years?
 
@@ -389,7 +393,6 @@ Several interrelated factors are driving these patterns:
 
 - Government policies have had measurable but limited impacts. Initiatives such as Manufacturing USA, the Manufacturing Extension Partnership, and Executive Order 14005 led to temporary increases in firm growth and modest productivity gains. However, rising labor costs and slow technological diffusion have dampened the effectiveness of these efforts. Policies promoting reshoring and domestic procurement have provided momentum, but long-term transformation will likely require deeper investment in automation, workforce training, and innovation infrastructure.
 
-# Conclusion
  
 The U.S. manufacturing sector is navigating a period of complex adjustment. From a global perspective, it faces growing competition from more cost-efficient production centers in Asia, even as domestic output and employment continue to rise modestly. Internally, manufacturers contend with rising labor costs, slow productivity gains, and shifting policy frameworks designed to support reshoring and innovation. For buyers, importing has become increasingly attractive due to sustained price advantages. For firms, federal initiatives have sparked growth spurts but have not resolved underlying cost pressures. For workers, the post-pandemic recovery brought better wages but also renewed concerns about long-term job security. These dynamics underscore a key insight: the future of U.S. manufacturing will depend not just on policy or production volume, but on its ability to adapt structurally—investing in advanced technologies, fostering a skilled workforce, and redefining competitiveness in an interconnected, fast-changing global economy. Ultimately, the future of U.S. manufacturing will be shaped not only by national policy and international pressures, but by the day-to-day choices of firms, workers, and buyers alike. Their experiences—navigating cost tradeoffs, job uncertainty, and competitive pressure—underscore that revitalizing manufacturing is as much a human story as an economic one.
 

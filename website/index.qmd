@@ -376,11 +376,11 @@ Together, these perspectives reveal a manufacturing sector facing rising interna
 
 # Conclusion 
 
-1. How does the U.S. manufacturing industry experience overall growth or decline in recent years?
+1. How has the U.S. manufacturing industry experienced overall growth or decline in recent years?
 
 - Our analysis reveals that the U.S. manufacturing sector has experienced modest growth in absolute output and employment over the past decade. While it has remained relatively stable in terms of its GDP share, it has been outpaced by service-oriented sectors such as professional services, healthcare, and finance. Employment levels have rebounded since the COVID-19 disruption, and output has steadily increased, but not at the rate seen in more dynamic parts of the economy. In essence, manufacturing is growing—but not fast enough to regain its central economic position.
 
-2. What are the key factors influencing these trends?
+2. What are the key factors driving these trends?
 
 Several interrelated factors are driving these patterns:
 
@@ -389,7 +389,7 @@ Several interrelated factors are driving these patterns:
 - Labor cost pressures: Rising unit labor costs, without commensurate productivity gains, have reduced cost competitiveness.
 - Pandemic shocks and recovery: COVID-19 triggered mass job losses, followed by a sharp but uneven recovery, with lingering uncertainty in the labor market.
 
-3. What role has government policy (e.g., reshoring efforts) played in shaping the manufacturing industry?
+3. What role have government policies (e.g., reshoring efforts) played in shaping the manufacturing industry?
 
 - Government policies have had measurable but limited impacts. Initiatives such as Manufacturing USA, the Manufacturing Extension Partnership, and Executive Order 14005 led to temporary increases in firm growth and modest productivity gains. However, rising labor costs and slow technological diffusion have dampened the effectiveness of these efforts. Policies promoting reshoring and domestic procurement have provided momentum, but long-term transformation will likely require deeper investment in automation, workforce training, and innovation infrastructure.
 

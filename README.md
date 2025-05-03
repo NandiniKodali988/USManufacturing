@@ -21,16 +21,13 @@ dsan5200-spring2025-project-group-13/
 │      ├── index.html
 │      ├── slides.html
 │      └── data.html
-│   ├── index.qmd                  # Quarto source (main narrative)
-│   ├── data.qmd                   # data format
-│   ├── slides.qmd                 # Optional slides (Quarto)
+│   ├── index.qmd                  # Main narrative
+│   ├── data.qmd                   # Data format
+│   ├── slides.qmd                 # Presentation
 │   └── news.png                   # Image asset
 │
 ├── code/                          # Jupyter notebooks for visualizations
-│   ├── __pycache__/               # Python cache (ignore)
-│   ├── data_cleaning/             # Data wrangling scripts (subfolder)
-│   ├── employment_rate_2_files/   # Additional data/plots for employment chart
-│   ├── .keep
+│   ├── data_cleaning/             # Data cleaning scripts 
 │   ├── cost_efficiency_producer.ipynb     # Producer perspective: bubble chart
 │   ├── employment_rate_2.ipynb            # Updated employment rate plot
 │   ├── employment_rate.ipynb              # Sectoral employment analysis
@@ -48,7 +45,7 @@ dsan5200-spring2025-project-group-13/
 │   ├── raw/
 │   └── Processed/
 │
-├── img/                           # Static image exports
+├── img/                           # HTML image exports
 │
 ├── README.md
 ├── _quarto.yml

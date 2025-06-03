@@ -1,5 +1,5 @@
 project:
-  type: website  # Defines the project type as a website
+  type: website 
   render:
      - "*.qmd"
 
@@ -9,8 +9,6 @@ website:
     left:
       - href: index.qmd
         text: "Navigating Change: Analyzing the Evolution of U.S. Manufacturing"
-      - text: "Data"
-        href: data.qmd
 format:
   html:
     theme: lux

@@ -6,7 +6,6 @@ format:
   html:
     embed-resources: true
     self-contained: true
-    output-dir: website
 execute:
   kernel: python3
   echo: false
@@ -30,140 +29,26 @@ industry?
 
 ## Global Positioning of U.S. Manufacturing (2013–2023)
 
-```{python}
-import pandas as pd
-import altair as alt
-import plotly.express as px
-import json
-import numpy as np
-df = pd.read_csv("../data/raw/manufacturing-value-added-to-gdp.csv")
-df = df.rename(columns={"Manufacturing, value added (% of GDP)": "ManufacturingGDP"})
-df = df[(df['Year'] >= 2013) & (df['Year'] <= 2024)]
+<iframe 
+  src="../img/manufacturing_gdp_map.html" 
+  width="100%" 
+  height="600" 
+  style="border: none; max-width: 100%; overflow: hidden;" 
+  sandbox="allow-scripts allow-same-origin">
+</iframe>
 
-df = df.dropna(subset=['Code']).reset_index(drop=True)
-
-# Create animated choropleth map
-fig = px.choropleth(
-    df,
-    locations="Entity",
-    locationmode="country names",   
-    color="ManufacturingGDP",
-    hover_name="Entity",
-    animation_frame="Year",
-    #color_continuous_scale="purples",
-    color_continuous_scale=[
-    (0.0, "#f2f0f7"),  # very light
-    (0.2, "#cbc9e2"), 
-    (0.4, "#9e9ac8"),  
-    (0.6, "#756bb1"),  
-    (0.8, "#54278f"),  
-    (1.0, "#3f007d")   # darkest
-],
-    range_color=[0, 40],            
-)
-
-fig.update_layout(
-    geo=dict(showframe=False, showcoastlines=False),
-    coloraxis_colorbar=dict(title="% of GDP")
-)
-
-fig.show()
-```
 
 The animated choropleth map provides a clear visualization of the global distribution of manufacturing’s contribution to GDP from 2013 to 2023. A key observation is that the United States has experienced relatively little change in its manufacturing share of GDP during this period, reflecting both resilience and structural stagnation in a highly competitive global landscape. In contrast, East and Southeast Asian countries—particularly China, Vietnam—consistently exhibit a high percentage of manufacturing value added relative to GDP. These regions have benefited from lower labor costs, export-oriented policies, and robust industrial infrastructures, solidifying their position as global manufacturing hubs. While external global competition has undoubtedly exerted pressure on the U.S. manufacturing sector, domestic economic transformations—such as the rise of service-based industries, increased automation, and shifts in consumer demand—have also reshaped the sector’s trajectory.
 
 ## GDP Race: Manufacturing vs. other Sectors
 
-```{python}
-import plotly.express as px
-import pandas as pd
-import numpy as np
-import plotly.express as px
-df = pd.read_csv("../data/Processed/GdpByInd.csv")
-# Clean up column names just in case
-df.columns = df.columns.str.strip()
-
-# Identify actual year columns (assuming they are 4-digit years)
-year_columns = [col for col in df.columns if col.isdigit() and len(col) == 4]
-
-# Melt the data safely
-df_long = df.melt(
-    id_vars=["Group", "Subgroup"],
-    value_vars=year_columns,
-    var_name="Year",
-    value_name="Value"
-)
-
-# Convert year to integer
-df_long["Year"] = df_long["Year"].astype(int)
-
-df_grouped = df_long.groupby(["Group", "Year"], as_index=False)["Value"].sum()
-
-unique_groups = df_grouped["Group"].unique()
-group_positions = {
-    group: (np.cos(i * 2 * np.pi / len(unique_groups)) * 3,
-            np.sin(i * 2 * np.pi / len(unique_groups)) * 3)
-    for i, group in enumerate(unique_groups)
-}
-
-# Filter for 2013–2024
-df_grouped_filtered = df_grouped[df_grouped["Year"].between(2013, 2024)].copy()
-
-# Convert from millions to billions
-df_grouped_filtered["Value_Trillions"] = df_grouped_filtered["Value"] / 1000000
-
-# Step 2: Add a column for custom coloring
-df_grouped_filtered["Color"] = df_grouped_filtered["Group"].apply(
-    lambda g: "Manufacturing" if g == "Manufacturing" else "Other"
-)
-
-# Step 3: Define color map (blue for Manufacturing, gray for others)
-color_map = {
-    "Manufacturing": "#28293D",
-    "Other": "#9997bc"
-}
-
-fig = px.bar(
-    df_grouped_filtered,
-    x="Value_Trillions",
-    y="Group",
-    color="Color",
-    animation_frame="Year",
-    orientation='h',
-    color_discrete_map=color_map,
-    hover_data={"Color": False}  
-)
-
-# Set custom tooltip on static traces (initial frame)
-for trace in fig.data:
-    trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion $): %{x:.2f}<extra></extra>"
-
-# Set custom tooltip on animated frames
-for frame in fig.frames:
-    for trace in frame.data:
-        trace.hovertemplate = "<b>%{y}</b><br>Value (Trillion $): %{x:.2f}<extra></extra>"
-
-fig.update_layout(
-    showlegend=False,
-    xaxis=dict(
-        title="Output (Trillions $)",
-        tickformat=".2f",
-        range=[0, 12.5],
-        showgrid=False,  # Turn off vertical grid lines
-        zeroline=False   # Turn off the thick zero line
-    ),
-    yaxis=dict(
-        title = "Sectors",
-        showgrid=False,  # Turn off horizontal grid lines
-        zeroline=False
-    ),
-    plot_bgcolor='white',   # Plot area background
-    paper_bgcolor='white',  # Entire figure background
-    margin=dict(t=40, l=100, r=40, b=40)
-)
-
-fig.show()
-```
+<iframe 
+  src="../img/gdp_barcharts_2013_2024.html" 
+  width="100%" 
+  height="600" 
+  style="border: none; max-width: 100%; overflow: hidden;" 
+  sandbox="allow-scripts allow-same-origin">
+</iframe>
 
 To better contextualize the position of U.S. manufacturing, we turn to a second set of visuals: bar charts illustrating output across key domestic sectors over the same period.
 
@@ -172,128 +57,14 @@ These charts reveal that while manufacturing has exhibited modest growth in abso
 Notably, sectors such as “Health, Education & Leisure” and “Trade & Transportation” have also experienced significant expansion, driven by demographic changes and the rise of digital commerce. Although manufacturing remains a foundational pillar of economic output, its relative standing has been increasingly overshadowed by sectors more directly aligned with technological innovation and consumer-driven services. This trend underscores the importance of understanding manufacturing not as an isolated sector, but as one that now operates within an increasingly service-integrated and digitally enabled economy.
 
 ## Employment Race: Manufacturing vs. other Sectors
+<iframe 
+  src="../img/stacked_employment_chart.html" 
+  width="100%" 
+  height="600" 
+  style="border: none; max-width: 100%; overflow: hidden;" 
+  sandbox="allow-scripts allow-same-origin">
+</iframe>
 
-```{python}
-import pandas as pd
-import altair as alt
-from IPython.display import display
-
-# Load data
-df_clean = pd.read_csv("../data/Processed/employment_rate.csv")
-df_clean['Month'] = pd.to_datetime(df_clean['Month'], errors='coerce')
-
-# Define industries and legend labels
-industries_to_plot = [
-    'Manufacturing',
-    'Construction',
-    'Retail trade',
-    'Transportation and warehousing',
-    'Leisure and hospitality',
-    'Financial activities'
-]
-
-legend_labels = {
-    'Manufacturing': 'Manufacturing',
-    'Construction': 'Utilities & Construction',
-    'Retail trade': 'Retail trade',
-    'Transportation and warehousing': 'Transportation and warehousing',
-    'Leisure and hospitality': 'Health, Education & Leisure',
-    'Financial activities': 'Information & Finance'
-}
-
-# Long format
-df_long = df_clean.melt(
-    id_vars=['Month'],
-    value_vars=industries_to_plot,
-    var_name='Industry',
-    value_name='Employment'
-)
-df_long['Industry_legend'] = df_long['Industry'].map(legend_labels)
-
-# Stack order
-stack_order = {
-    'Manufacturing': 0,
-    'Utilities & Construction': 1,
-    'Retail trade': 2,
-    'Transportation and warehousing': 3,
-    'Health, Education & Leisure': 4,
-    'Information & Finance': 5
-}
-df_long['stack_order'] = df_long['Industry_legend'].map(stack_order)
-
-# Filter data to include only years up to 2024
-df_long = df_long[df_long['Month'].dt.year <= 2024]
-
-# Color palette (Manufacturing and Info & Finance swapped)
-ordered_industries = [
-    'Manufacturing',
-    'Utilities & Construction',
-    'Retail trade',
-    'Transportation and warehousing',
-    'Health, Education & Leisure',
-    'Information & Finance'
-]
-custom_colors = ['#653497', '#3d6469', '#5f0922', '#ff4500', '#03c1c2', '#d40537']
-
-# Base stacked area chart
-area_stack_chart = alt.Chart(df_long).mark_area(opacity=0.8).encode(
-    x=alt.X('Month:T',
-            title='Year',
-            axis=alt.Axis(
-                format='%Y',
-                grid=False,
-                labelExpr="timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : ''"
-            )),
-    y=alt.Y('Employment:Q',
-            stack='zero',
-            title='Employment (Thousands)',
-            axis=alt.Axis(grid=False)),
-    color=alt.Color(
-        'Industry_legend:N',
-        scale=alt.Scale(
-            domain=ordered_industries,
-            range=custom_colors
-        ),
-        legend=None
-    ),
-    order=alt.Order('stack_order:Q'),
-    tooltip=[
-        alt.Tooltip('Month:T', title='Year', format='%Y'),
-        alt.Tooltip('Month:T', title='Quarter', timeUnit='quarter'),
-        alt.Tooltip('Industry_legend:N', title='Industry'),
-        alt.Tooltip('Employment:Q', title='Employment')
-    ]
-).properties(
-    width='container',
-    height=400,
-    title='Stacked Employment Trend by Industry (2013–2023)'
-)
-
-# --- Create annotations ---
-last_month = df_long['Month'].max()
-df_last = df_long[df_long['Month'] == last_month].copy()
-df_last = df_last.sort_values('stack_order')
-df_last['y0'] = df_last['Employment'].cumsum() - df_last['Employment']
-df_last['y1'] = df_last['Employment'].cumsum()
-df_last['y_mid'] = (df_last['y0'] + df_last['y1']) / 2
-
-annotations = alt.Chart(df_last).mark_text(
-    align='left',
-    baseline='middle',
-    dx=5,
-    color='black'  # force all text to be black
-).encode(
-    x=alt.X('Month:T'),
-    y=alt.Y('y_mid:Q'),
-    text='Industry_legend:N'
-)
-
-
-
-# Final chart with labels
-final_chart = (area_stack_chart + annotations).configure_view(stroke=None)
-display(final_chart)
-```
 
 To complement the sectoral output analysis, a stacked area chart illustrating employment trends from 2013 to 2023 offers a valuable labor market perspective. When placed alongside the bar charts that track economic output by sector, this visualization highlights a subtle but important dynamic: while the manufacturing sector has experienced consistent growth in employment, it has not kept pace with the more rapid expansion seen in other industries.
 

@@ -39,7 +39,11 @@ By connecting broad trends with on-the-ground realities, this report aims to pro
 </iframe>
 
 
-The animated choropleth map provides a clear visualization of the global distribution of manufacturing’s contribution to GDP from 2013 to 2023. A key observation is that the United States has experienced relatively little change in its manufacturing share of GDP during this period, reflecting both resilience and structural stagnation in a highly competitive global landscape. In contrast, East and Southeast Asian countries—particularly China, Vietnam—consistently exhibit a high percentage of manufacturing value added relative to GDP. These regions have benefited from lower labor costs, export-oriented policies, and robust industrial infrastructures, solidifying their position as global manufacturing hubs. While external global competition has undoubtedly exerted pressure on the U.S. manufacturing sector, domestic economic transformations—such as the rise of service-based industries, increased automation, and shifts in consumer demand—have also reshaped the sector’s trajectory.
+The animated choropleth map illustrates how manufacturing's share of GDP has changed across the globe from 2013 to 2023, highlighting both stability and transformation. In the United States, the manufacturing share of GDP has remained relatively steady throughout the decade. This pattern reflects a mix of resilience and structural stagnation, especially as other parts of the world have undergone rapid shifts.
+
+In contrast, countries in East and Southeast Asia, particularly China and Vietnam, consistently show a high share of manufacturing value added. Their success can be traced to a combination of lower labor costs, export-focused economic strategies, and well-developed industrial infrastructure. These factors have helped secure their place as leading manufacturing centers in the global economy.
+
+While competition from abroad has put pressure on the U.S. manufacturing sector, internal dynamics have also played a key role. The expansion of service-based industries, the increasing use of automation, and changing patterns in consumer demand have all contributed to reshaping the sector’s role within the broader economy.
 
 ## GDP Race: Manufacturing vs. other Sectors
 
